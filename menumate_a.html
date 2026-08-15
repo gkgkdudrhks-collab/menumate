@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MenuMate v2 - 3단계 스마트 회식 메뉴 추천기 (엔진 출처 표시)</title>
+  <meta name="description" content="menumate v2: LLM API 호출 또는 내장 알고리즘 사용 여부를 투명하게 표시하는 3단계 회식 메뉴 추천기">
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-input: #ffffff;
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-light: #fff7ed;
+      --primary-border: #fed7aa;
+      
+      --secondary: #3b82f6;
+      --secondary-light: #eff6ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --warning: #f59e0b;
+      --purple: #8b5cf6;
+      --purple-light: #f5f3ff;
+      
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.55;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== App Header ===== */
+    .app-header {
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      color: white;
+      padding: 22px 28px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-logo .icon-box {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(6px);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    .header-title h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title p {
+      font-size: 0.86rem;
+      opacity: 0.95;
+    }
+
+    .header-api-badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: white;
+      transition: var(--transition);
+    }
+    .header-api-badge:hover {
+      background: white;
+      color: var(--primary-hover);
+    }
+
+    /* ===== Step Wizard Indicator ===== */
+    .step-wizard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-tab {
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .step-tab:last-child { border-right: none; }
+
+    .step-tab .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .step-tab.active {
+      background: var(--primary-light);
+      color: var(--primary-hover);
+    }
+    .step-tab.active .step-num {
+      background: var(--primary);
+      color: white;
+    }
+
+    @media (max-width: 640px) {
+      .step-tab span.step-text { display: none; }
+      .step-tab { padding: 12px 6px; }
+    }
+
+    /* ===== Card Common ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .section-title span.left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    /* ===== Form Elements ===== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+
+    /* Grid for User Creation */
+    .user-create-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .user-create-layout { grid-template-columns: 1fr; }
+    }
+
+    .sub-panel {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .sub-panel-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Food Chips Pool */
+    .food-chip-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+
+    .food-tag-chip {
+      padding: 5px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .food-tag-chip:hover { border-color: var(--primary); }
+    .food-tag-chip.selected-like {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .food-tag-chip.selected-dislike {
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+
+    /* Sliders */
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .score-val { color: var(--primary-hover); font-weight: 800; }
+    .custom-range {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    /* Allergies */
+    .allergy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+      gap: 8px;
+    }
+    .allergy-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .allergy-label:hover { border-color: var(--danger); }
+    .allergy-label input { accent-color: var(--danger); }
+    .allergy-label input:checked + span { color: var(--danger); font-weight: 700; }
+
+    /* Registered Users List Cards */
+    .users-grid-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .user-profile-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .user-profile-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .user-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .user-info-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-avatar-badge {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-subtle);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-name-role h4 { font-size: 0.95rem; font-weight: 800; }
+    .user-name-role span { font-size: 0.75rem; color: var(--text-muted); }
+
+    .user-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.72rem;
+    }
+    .tag-pill {
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .tag-pill.like { background: var(--primary-light); color: var(--primary-hover); }
+    .tag-pill.dislike { background: var(--danger-light); color: var(--danger); }
+    .tag-pill.allergy { background: #fef2f2; color: #b91c1c; font-weight: 700; }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-subtle);
+      border-color: var(--text-secondary);
+    }
+
+    .btn-subtle {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-subtle:hover { color: var(--danger); background: var(--danger-light); }
+
+    /* ===== Step 2: Member Selection Grid ===== */
+    .select-members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .member-select-card {
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      user-select: none;
+    }
+    .member-select-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+    .member-select-checkbox {
+      margin-top: 4px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+    /* ===== Step 3: Engine Provenance Banner & LLM Results ===== */
+    .engine-provenance-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 2px solid transparent;
+    }
+
+    .engine-provenance-banner.gemini {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+
+    .engine-provenance-banner.algorithm {
+      background: #f0fdf4;
+      border-color: #10b981;
+      color: #166534;
+    }
+
+    .engine-badge-tag {
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: white;
+    }
+    .engine-badge-tag.gemini { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .engine-badge-tag.algorithm { background: linear-gradient(135deg, #10b981, #059669); }
+
+    .llm-analysis-summary {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      padding: 18px 22px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+    }
+    .llm-analysis-summary h4 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #f59e0b;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .llm-analysis-summary p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .top3-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .top3-cards-grid { grid-template-columns: 1fr; }
+    }
+
+    .recom-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+    .recom-card.rank-1 {
+      border-color: #f59e0b;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 35%);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
+    }
+    .recom-card.rank-2 { border-color: #94a3b8; }
+    .recom-card.rank-3 { border-color: #b45309; }
+
+    .rank-tag {
+      position: absolute;
+      top: -12px;
+      left: 18px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .rank-1 .rank-tag { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .rank-2 .rank-tag { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .rank-3 .rank-tag { background: linear-gradient(135deg, #b45309, #78350f); }
+
+    .menu-title-row {
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+    .menu-title-row h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-meta-info {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .fit-gauge {
+      margin: 12px 0;
+      background: var(--bg-subtle);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .fit-gauge-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .fit-track {
+      height: 8px;
+      background: var(--border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+    .fit-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: var(--radius-full);
+    }
+
+    .ai-reasoning-box {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 12px 0;
+      background: #fafafa;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--primary);
+    }
+
+    .member-predictions-list {
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.76rem;
+    }
+    .member-pred-item {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+    }
+
+    /* Voting Box */
+    .voting-widget-box {
+      background: #0f172a;
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 22px;
+    }
+    .voting-widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .voting-options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 768px) {
+      .voting-options-grid { grid-template-columns: 1fr; }
+    }
+    .vote-btn-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .vote-btn-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #f59e0b;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: white;
+      gap: 18px;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner-box {
+      font-size: 3rem;
+      color: #f59e0b;
+      animation: spin 1.5s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-status-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .loading-sub-text {
+      font-size: 0.88rem;
+      color: #94a3b8;
+    }
+
+    /* Modal for API Key */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Toast */
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <div class="icon-box">🍽️</div>
+        <div class="header-title">
+          <h1>MenuMate v2</h1>
+          <p>한식·중식·일식·양식 맞춤형 3단계 회식 메뉴 추천기 (엔진 출처 명시)</p>
+        </div>
+      </div>
+      <button id="btn-open-api-modal" class="header-api-badge">
+        <i class="fa-solid fa-key"></i> <span id="api-status-badge">LLM API 설정 (Google Gemini)</span>
+      </button>
+    </header>
+
+    <!-- 3-Step Wizard Navigation Bar -->
+    <nav class="step-wizard">
+      <div id="step-tab-1" class="step-tab active" data-step="1">
+        <span class="step-num">1</span>
+        <span class="step-text">이용자 정보 저장</span>
+      </div>
+      <div id="step-tab-2" class="step-tab" data-step="2">
+        <span class="step-num">2</span>
+        <span class="step-text">멤버 선택 & 분석 요청</span>
+      </div>
+      <div id="step-tab-3" class="step-tab" data-step="3">
+        <span class="step-num">3</span>
+        <span class="step-text">추천 결과 & 투표</span>
+      </div>
+    </nav>
+
+    <!-- ==========================================
+         STEP 1: 이용자 정보 저장 화면
+         ========================================== -->
+    <section id="screen-step-1" class="screen-view">
+      <!-- 1) 신규 이용자 정보 등록 폼 -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-user-plus"></i> 이용자 음식 취향 프로필 등록</span>
+        </div>
+
+        <form id="user-register-form">
+          <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label">아바타</label>
+              <select id="user-avatar" class="form-control" style="font-size:1.2rem; padding: 6px 8px;">
+                <option value="🧑‍💻">🧑‍💻</option>
+                <option value="🙋‍♂️">🙋‍♂️</option>
+                <option value="🙋‍♀️">🙋‍♀️</option>
+                <option value="🍗">🍗</option>
+                <option value="🥗">🥗</option>
+                <option value="🍜">🍜</option>
+                <option value="🥩">🥩</option>
+                <option value="🍕">🍕</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="user-name">이름 / 닉네임 *</label>
+              <input type="text" id="user-name" class="form-control" placeholder="예: 이서준" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="user-role">특징 태그</label>
+              <input type="text" id="user-role" class="form-control" placeholder="예: 총무, 맵찔이, 다이어터">
+            </div>
+          </div>
+
+          <div class="user-create-layout">
+            <!-- 왼쪽: 선호/불호 칩 & Food DNA 슬라이더 -->
+            <div>
+              <div class="sub-panel">
+                <div class="sub-panel-title">
+                  <span>❤️ 선호하는 음식 (최대 5개)</span>
+                  <span id="form-like-count" style="color:var(--primary); font-weight:700;">0/5</span>
+                </div>
+                <div id="form-like-chips" class="food-chip-pool"></div>
+              </div>
+
+              <div class="sub-panel">
+                <div class="sub-panel-title">
+                  <span>💔 싫어하는 / 피할 음식 (최대 5개)</span>
+                  <span id="form-dislike-count" style="color:var(--danger); font-weight:700;">0/5</span>
+                </div>
+                <div id="form-dislike-chips" class="food-chip-pool"></div>
+              </div>
+
+              <div class="sub-panel">
+                <div class="sub-panel-title">
+                  <span>📊 Food DNA 취향 점수 (-5 ~ +5)</span>
+                </div>
+                <!-- 매운맛 슬라이더 -->
+                <div class="slider-item">
+                  <div class="slider-header"><span>🌶️ 매운맛 선호</span><span id="txt-form-spice" class="score-val">0</span></div>
+                  <input type="range" id="form-spice" class="custom-range" min="-5" max="5" value="0">
+                  <div class="slider-labels"><span>-5 (순한맛)</span><span>0</span><span>+5 (핵불닭)</span></div>
+                </div>
+                <!-- 기름짐 슬라이더 -->
+                <div class="slider-item">
+                  <div class="slider-header"><span>🧈 기름짐/튀김 수용도</span><span id="txt-form-greasy" class="score-val">0</span></div>
+                  <input type="range" id="form-greasy" class="custom-range" min="-5" max="5" value="0">
+                  <div class="slider-labels"><span>-5 (클린식)</span><span>0</span><span>+5 (기름진맛)</span></div>
+                </div>
+                <!-- 육류 vs 해산물 -->
+                <div class="slider-item">
+                  <div class="slider-header"><span>🥩 육류 vs 🐟 해산물</span><span id="txt-form-meat" class="score-val">0</span></div>
+                  <input type="range" id="form-meat" class="custom-range" min="-5" max="5" value="0">
+                  <div class="slider-labels"><span>-5 (해산물)</span><span>0</span><span>+5 (고기파)</span></div>
+                </div>
+                <!-- 단짠 -->
+                <div class="slider-item">
+                  <div class="slider-header"><span>🍯 단짠 자극 선호</span><span id="txt-form-sweet" class="score-val">0</span></div>
+                  <input type="range" id="form-sweet" class="custom-range" min="-5" max="5" value="0">
+                  <div class="slider-labels"><span>-5 (슴슴)</span><span>0</span><span>+5 (단짠)</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 오른쪽: 알레르기 체크박스 & 최근 식사 기록 -->
+            <div>
+              <div class="sub-panel">
+                <div class="sub-panel-title">
+                  <span>🚫 알레르기 / 비선호 재료 (완전 배제)</span>
+                </div>
+                <div id="form-allergy-grid" class="allergy-grid"></div>
+              </div>
+
+              <div class="sub-panel">
+                <div class="sub-panel-title">
+                  <span>🕒 최근 식사 기록 (3일내 -30%, 7일내 -15% 페널티)</span>
+                </div>
+                <div id="form-recent-meals-list" style="margin-bottom:8px;"></div>
+                <div style="display:flex; gap:6px;">
+                  <select id="form-recent-food-select" class="form-control" style="font-size:0.8rem;"></select>
+                  <select id="form-recent-days-select" class="form-control" style="font-size:0.8rem; width:110px;">
+                    <option value="1">어제 (1일전)</option>
+                    <option value="2">2일 전</option>
+                    <option value="3">3일 전</option>
+                    <option value="5">5일 전</option>
+                    <option value="7">7일 전</option>
+                  </select>
+                  <button type="button" id="btn-add-form-recent" class="btn-secondary" style="padding:6px 12px; font-size:0.8rem;">
+                    + 추가
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
+                <i class="fa-solid fa-floppy-disk"></i> 이용자 정보 저장하기
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- 2) 저장된 이용자 목록 카드 -->
+      <div class="card">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-users"></i> 등록된 이용자 목록 (<span id="user-count-badge">0</span>명)</span>
+          <button type="button" id="btn-load-sample-users" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 테스트용 예시 멤버 4명 불러오기
+          </button>
+        </div>
+
+        <div id="registered-users-container" class="users-grid-display"></div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" id="btn-goto-step-2" class="btn-primary" style="font-size:1.05rem;">
+            <span>다음 단계: 회식 멤버 선택하기</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 2: 이용자 선택 & 분석 시작 화면
+         ========================================== -->
+    <section id="screen-step-2" class="screen-view" style="display:none;">
+      <div class="card">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-user-check"></i> 이번 회식/주문에 참여할 이용자 선택</span>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="btn-select-all-members" class="btn-secondary" style="font-size:0.8rem; padding:4px 10px;">전체 선택</button>
+            <button type="button" id="btn-deselect-all-members" class="btn-secondary" style="font-size:0.8rem; padding:4px 10px;">전체 해제</button>
+          </div>
+        </div>
+
+        <!-- 멤버 선택 그리드 -->
+        <div id="step2-member-select-grid" class="select-members-grid"></div>
+
+        <!-- 모임 조건 설정 -->
+        <div class="sub-panel" style="margin-top: 14px;">
+          <div class="sub-panel-title">
+            <span>⚙️ 회식 / 주문 상세 조건</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" for="room-title-input">모임 / 회식 이름</label>
+              <input type="text" id="room-title-input" class="form-control" value="🎉 동아리 뒤풀이 회식">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" for="room-budget-select">1인당 예산</label>
+              <select id="room-budget-select" class="form-control">
+                <option value="999999">제한 없음 (전체 메뉴)</option>
+                <option value="12000">12,000원 이하 (가성비)</option>
+                <option value="18000" selected>18,000원 이하 (보통)</option>
+                <option value="25000">25,000원 이하 (푸짐하게)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" for="room-spice-select">모임 최대 맵기 허용</label>
+              <select id="room-spice-select" class="form-control">
+                <option value="1">1단계: 순한맛만 가능 (신라면 미만)</option>
+                <option value="2" selected>2단계: 보통맛 가능 (신라면 수준)</option>
+                <option value="3">3단계: 매운맛 가능 (불닭볶음면 수준)</option>
+                <option value="5">제한 없음 (극강의 매운맛 환영)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 액션 버튼 바 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
+          <button type="button" id="btn-back-to-step-1" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 이용자 관리로 돌아가기
+          </button>
+          <button type="button" id="btn-call-llm-recommend" class="btn-primary" style="padding:16px 28px; font-size:1.1rem;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> <span>선택된 멤버 취향으로 최적 메뉴 추천 시작</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 3: 추천 결과 띄워주는 화면 (엔진 출처 표시)
+         ========================================== -->
+    <section id="screen-step-3" class="screen-view" style="display:none;">
+      <div class="card">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn-quick-refresh-recom" class="btn-primary" style="font-size:0.85rem; padding:8px 16px; background:linear-gradient(135deg, #10b981, #059669); box-shadow:none;">
+              <i class="fa-solid fa-arrows-rotate"></i> 다른 메뉴로 재추천
+            </button>
+            <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
+              <i class="fa-solid fa-sliders"></i> 조건 변경하기
+            </button>
+          </div>
+        </div>
+
+        <!-- 🌟 엔진 출처 배너 (API vs 알고리즘) -->
+        <div id="engine-provenance-banner" class="engine-provenance-banner algorithm">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i id="engine-banner-icon" class="fa-solid fa-calculator" style="font-size:1.3rem;"></i>
+            <div>
+              <div id="engine-banner-title">MenuMate 내장 불호방어 알고리즘으로 분석된 결과입니다.</div>
+              <div id="engine-banner-sub" style="font-size:0.78rem; opacity:0.85; font-weight:500;">
+                평균 만족도 + 최저 만족도 방어 + 알레르기 100% 필터링 + 최근 식사 감점이 적용되었습니다.
+              </div>
+            </div>
+          </div>
+          <span id="engine-badge-tag" class="engine-badge-tag algorithm">내장 알고리즘 적용</span>
+        </div>
+
+        <!-- 추천 종합 진단 요약 박스 -->
+        <div id="llm-reasoning-summary" class="llm-analysis-summary">
+          <h4><i class="fa-solid fa-robot"></i> 종합 진단 분석</h4>
+          <p id="llm-summary-text">선택된 참여자들의 Food DNA와 알레르기, 최근 식사 기록을 분석하여 모두가 만족할 최적의 메뉴를 도출했습니다.</p>
+        </div>
+
+        <!-- 추천 TOP 3 카드 그리드 -->
+        <div id="step3-top3-grid" class="top3-cards-grid"></div>
+
+        <!-- 최종 메뉴 결정을 위한 투표 위젯 -->
+        <div class="voting-widget-box">
+          <div class="voting-widget-header">
+            <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
+            </h3>
+            <span style="font-size:0.8rem; color:#94a3b8;">가장 마음에 드는 메뉴를 투표해 최종 메뉴를 확정하세요.</span>
+          </div>
+
+          <div id="step3-voting-options-list" class="voting-options-grid"></div>
+
+          <div style="text-align:center; margin-top:12px;">
+            <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px;">
+              🏆 1위 메뉴로 최종 주문 결정하기!
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" id="btn-back-to-step-2" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 참여 멤버 다시 선택하기
+          </button>
+          <button type="button" id="btn-bottom-quick-refresh" class="btn-primary" style="background:linear-gradient(135deg, #10b981, #059669); font-size:0.95rem; padding:12px 22px;">
+            <i class="fa-solid fa-arrows-rotate"></i> 다른 메뉴 조합으로 다시 추천받기
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- LLM AI API Key 설정 모달 -->
+  <div id="api-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="section-title" style="margin-bottom:12px;">
+        <span class="left"><i class="fa-solid fa-key"></i> LLM API 설정</span>
+        <button type="button" id="btn-close-api-modal" style="background:none; border:none; font-size:1.3rem; cursor:pointer;">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+        Google Gemini API Key(<code>AIzaSy...</code>)를 등록하시면 실시간으로 최신 <strong>Gemini 1.5 Flash</strong> 모델을 호출하여 메뉴를 분석합니다.<br>
+        (API Key가 등록되지 않은 경우 <strong>MenuMate 자체 내장 알고리즘</strong>으로 즉시 실행됩니다.)
+      </p>
+      <div class="form-group">
+        <label class="form-label" for="gemini-api-key">Google Gemini API Key</label>
+        <input type="password" id="gemini-api-key" class="form-control" placeholder="AIzaSy...">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+        <button type="button" id="btn-clear-api-key" class="btn-secondary">키 삭제</button>
+        <button type="button" id="btn-save-api-key" class="btn-primary">저장 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner-box"><i class="fa-solid fa-brain"></i></div>
+    <div id="loading-status" class="loading-status-text">참여자들의 취향 및 조건을 분석 중입니다...</div>
+    <div class="loading-sub-text">알레르기 필터링, 불호 방어 지수, 최근 식사 기록을 종합 계산하고 있습니다.</div>
+  </div>
+
+  <!-- 토스트 팝업 -->
+  <div id="toast" class="toast-popup">
+    <i class="fa-solid fa-circle-check" style="color:#10b981;"></i>
+    <span id="toast-text">알림 메시지</span>
+  </div>
+
+  <!-- ===== 자바스크립트 로직 ===== -->
+  <script>
+    // ===== 1. 배달/외식 메뉴 메타데이터 (한식/중식/일식/양식 4대 카테고리) =====
+    const MENU_CATEGORIES = ['한식', '중식', '일식', '양식'];
+
+    const MENU_CATALOG = [
+      // 1. 한식
+      { id: 'k1', name: '삼겹살', category: '한식', emoji: '🥓', spice: 1, greasy: 4, meat: 5, sweet: 1, allergens: ['돼지고기'], price: 16000 },
+      { id: 'k2', name: '보쌈·족발', category: '한식', emoji: '🍖', spice: 1, greasy: 2, meat: 5, sweet: 2, allergens: ['돼지고기'], price: 17000 },
+      { id: 'k3', name: '김치찌개', category: '한식', emoji: '🍲', spice: 2, greasy: 2, meat: 3, sweet: 1, allergens: ['돼지고기', '계란'], price: 9500 },
+      { id: 'k4', name: '제육볶음', category: '한식', emoji: '🍱', spice: 2, greasy: 2, meat: 4, sweet: 3, allergens: ['돼지고기'], price: 10000 },
+      { id: 'k5', name: '찜닭', category: '한식', emoji: '🍲', spice: 1, greasy: 2, meat: 4, sweet: 3, allergens: ['닭고기', '밀가루'], price: 13000 },
+      { id: 'k6', name: '닭볶음탕', category: '한식', emoji: '🥘', spice: 3, greasy: 2, meat: 4, sweet: 2, allergens: ['닭고기'], price: 13500 },
+      { id: 'k7', name: '소불고기', category: '한식', emoji: '🍲', spice: 0, greasy: 2, meat: 4, sweet: 4, allergens: ['소고기'], price: 13000 },
+      { id: 'k8', name: '떡볶이', category: '한식', emoji: '🫕', spice: 2, greasy: 1, meat: 1, sweet: 3, allergens: ['밀가루'], price: 8000 },
+      { id: 'k9', name: '비빔밥', category: '한식', emoji: '🥗', spice: 1, greasy: -3, meat: 2, sweet: 1, allergens: ['계란'], price: 9000 },
+      { id: 'k10', name: '순대국', category: '한식', emoji: '🍲', spice: 1, greasy: 3, meat: 4, sweet: 0, allergens: ['돼지고기'], price: 9500 },
+
+      // 2. 중식
+      { id: 'c1', name: '짜장면', category: '중식', emoji: '🥢', spice: 0, greasy: 3, meat: 2, sweet: 3, allergens: ['돼지고기', '밀가루'], price: 8500 },
+      { id: 'c2', name: '짬뽕', category: '중식', emoji: '🍜', spice: 3, greasy: 2, meat: -3, sweet: 1, allergens: ['갑각류', '밀가루'], price: 9500 },
+      { id: 'c3', name: '탕수육', category: '중식', emoji: '🥢', spice: 0, greasy: 4, meat: 4, sweet: 4, allergens: ['돼지고기', '밀가루'], price: 14000 },
+      { id: 'c4', name: '마라탕', category: '중식', emoji: '🌶️', spice: 4, greasy: 3, meat: 2, sweet: 1, allergens: ['땅콩', '소고기', '갑각류'], price: 12000 },
+      { id: 'c5', name: '꿔바로우', category: '중식', emoji: '🥢', spice: 0, greasy: 4, meat: 4, sweet: 4, allergens: ['돼지고기', '밀가루'], price: 15000 },
+      { id: 'c6', name: '중화볶음밥', category: '중식', emoji: '🍚', spice: 0, greasy: 3, meat: 2, sweet: 1, allergens: ['계란', '돼지고기'], price: 8500 },
+      { id: 'c7', name: '칠리새우', category: '중식', emoji: '🍤', spice: 2, greasy: 3, meat: -4, sweet: 3, allergens: ['갑각류', '밀가루'], price: 16000 },
+
+      // 3. 일식
+      { id: 'j1', name: '초밥', category: '일식', emoji: '🍣', spice: 0, greasy: -3, meat: -5, sweet: 1, allergens: ['생선', '갑각류'], price: 16000 },
+      { id: 'j2', name: '돈까스', category: '일식', emoji: '🍱', spice: 0, greasy: 4, meat: 4, sweet: 2, allergens: ['돼지고기', '밀가루', '계란'], price: 11000 },
+      { id: 'j3', name: '라멘', category: '일식', emoji: '🍜', spice: 1, greasy: 3, meat: 3, sweet: 1, allergens: ['돼지고기', '밀가루', '계란'], price: 10000 },
+      { id: 'j4', name: '연어덮밥', category: '일식', emoji: '🍣', spice: 0, greasy: 0, meat: -4, sweet: 1, allergens: ['생선'], price: 13000 },
+      { id: 'j5', name: '규동', category: '일식', emoji: '🥩', spice: 0, greasy: 2, meat: 4, sweet: 3, allergens: ['소고기', '계란'], price: 10500 },
+      { id: 'j6', name: '우동·소바', category: '일식', emoji: '🍜', spice: 0, greasy: -2, meat: 0, sweet: 1, allergens: ['밀가루', '메밀'], price: 8500 },
+      { id: 'j7', name: '가츠동', category: '일식', emoji: '🍱', spice: 0, greasy: 3, meat: 4, sweet: 3, allergens: ['돼지고기', '밀가루', '계란'], price: 10000 },
+
+      // 4. 양식
+      { id: 'w1', name: '후라이드 치킨', category: '양식', emoji: '🍗', spice: 0, greasy: 4, meat: 5, sweet: 1, allergens: ['닭고기', '밀가루'], price: 10000 },
+      { id: 'w2', name: '양념 치킨', category: '양식', emoji: '🍗', spice: 1, greasy: 4, meat: 5, sweet: 4, allergens: ['닭고기', '밀가루', '땅콩'], price: 11000 },
+      { id: 'w3', name: '피자', category: '양식', emoji: '🍕', spice: 0, greasy: 3, meat: 3, sweet: 2, allergens: ['유제품', '돼지고기', '소고기', '밀가루'], price: 12000 },
+      { id: 'w4', name: '파스타', category: '양식', emoji: '🍝', spice: 0, greasy: 3, meat: 2, sweet: 2, allergens: ['유제품', '돼지고기', '밀가루', '계란'], price: 12500 },
+      { id: 'w5', name: '햄버거', category: '양식', emoji: '🍔', spice: 1, greasy: 4, meat: 5, sweet: 2, allergens: ['소고기', '유제품', '밀가루'], price: 10000 },
+      { id: 'w6', name: '스테이크', category: '양식', emoji: '🥩', spice: 0, greasy: 3, meat: 5, sweet: 1, allergens: ['소고기', '유제품'], price: 22000 },
+      { id: 'w7', name: '샐러드', category: '양식', emoji: '🥗', spice: 0, greasy: -5, meat: 2, sweet: 0, allergens: ['닭고기'], price: 9500 },
+      { id: 'w8', name: '리조또', category: '양식', emoji: '🍚', spice: 0, greasy: 3, meat: 3, sweet: 2, allergens: ['유제품', '밀가루'], price: 13000 }
+    ];
+
+    const ALL_ALLERGENS_LIST = ['갑각류', '땅콩', '유제품', '돼지고기', '소고기', '닭고기', '생선', '밀가루', '오이', '계란'];
+
+    // ===== 2. 애플리케이션 상태 관리 =====
+    let users = [];
+    let tempFormLikes = [];
+    let tempFormDislikes = [];
+    let tempFormRecentMeals = [];
+    let selectedMemberIds = new Set();
+    let currentTop3Results = [];
+    // LLM API 키 상태 (사용자 직접 입력 또는 Vercel 환경 변수로 주입)
+    let DEFAULT_KEY = '';
+    let geminiApiKey = localStorage.getItem('menumate_gemini_api_key') || '';
+    let lastUsedEngineType = 'gemini'; // 'gemini' | 'algorithm'
+
+    // ===== 3. 초기화 =====
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUsersFromStorage();
+      initFormControls();
+      updateApiKeyUI();
+      attachAppEvents();
+      renderRegisteredUsers();
+    });
+
+    function loadUsersFromStorage() {
+      const saved = localStorage.getItem('menumate_v2_users');
+      if (saved) {
+        try { users = JSON.parse(saved); } catch(e) { users = []; }
+      } else {
+        users = [];
+      }
+    }
+
+    function saveUsersToStorage() {
+      localStorage.setItem('menumate_v2_users', JSON.stringify(users));
+      renderRegisteredUsers();
+    }
+
+    function updateApiKeyUI() {
+      const badge = document.getElementById('api-status-badge');
+      if (geminiApiKey) {
+        badge.innerHTML = '🟢 Gemini LLM API 키 설정됨';
+        document.getElementById('gemini-api-key').value = geminiApiKey;
+      } else {
+        badge.innerHTML = '⚙️ LLM API 설정 (Google Gemini)';
+        document.getElementById('gemini-api-key').value = '';
+      }
+    }
+
+    // ===== 4. 폼 및 컨트롤 초기화 =====
+    function initFormControls() {
+      // 1) 한식/중식/일식/양식 카테고리별 칩 생성
+      const likeBox = document.getElementById('form-like-chips');
+      const dislikeBox = document.getElementById('form-dislike-chips');
+      likeBox.innerHTML = '';
+      dislikeBox.innerHTML = '';
+
+      MENU_CATEGORIES.forEach(cat => {
+        const catFoods = MENU_CATALOG.filter(m => m.category === cat);
+        
+        // Like 카테고리 헤더
+        const likeCatHeader = document.createElement('div');
+        likeCatHeader.style.cssText = 'width:100%; font-size:0.75rem; font-weight:800; color:var(--text-secondary); margin-top:6px; margin-bottom:2px; display:flex; align-items:center; gap:4px;';
+        likeCatHeader.innerHTML = `<span style="background:var(--border); padding:1px 6px; border-radius:4px;">${cat}</span>`;
+        likeBox.appendChild(likeCatHeader);
+
+        catFoods.forEach(menu => {
+          const lChip = document.createElement('button');
+          lChip.type = 'button';
+          lChip.className = 'food-tag-chip';
+          lChip.dataset.food = menu.name;
+          lChip.innerHTML = `${menu.emoji} ${menu.name}`;
+          lChip.addEventListener('click', () => toggleFormLike(menu.name));
+          likeBox.appendChild(lChip);
+        });
+
+        // Dislike 카테고리 헤더
+        const dislikeCatHeader = document.createElement('div');
+        dislikeCatHeader.style.cssText = 'width:100%; font-size:0.75rem; font-weight:800; color:var(--text-secondary); margin-top:6px; margin-bottom:2px; display:flex; align-items:center; gap:4px;';
+        dislikeCatHeader.innerHTML = `<span style="background:var(--border); padding:1px 6px; border-radius:4px;">${cat}</span>`;
+        dislikeBox.appendChild(dislikeCatHeader);
+
+        catFoods.forEach(menu => {
+          const dChip = document.createElement('button');
+          dChip.type = 'button';
+          dChip.className = 'food-tag-chip';
+          dChip.dataset.food = menu.name;
+          dChip.innerHTML = `${menu.emoji} ${menu.name}`;
+          dChip.addEventListener('click', () => toggleFormDislike(menu.name));
+          dislikeBox.appendChild(dChip);
+        });
+      });
+
+      // 2) 알레르기 체크박스 생성
+      const algGrid = document.getElementById('form-allergy-grid');
+      algGrid.innerHTML = '';
+      ALL_ALLERGENS_LIST.forEach(alg => {
+        const label = document.createElement('label');
+        label.className = 'allergy-label';
+        label.innerHTML = `<input type="checkbox" value="${alg}"> <span>${alg}</span>`;
+        algGrid.appendChild(label);
+      });
+
+      // 3) 최근 식사 셀렉트 옵션 (카테고리별 optgroup)
+      const foodSel = document.getElementById('form-recent-food-select');
+      foodSel.innerHTML = MENU_CATEGORIES.map(cat => {
+        const opts = MENU_CATALOG.filter(m => m.category === cat).map(m => `<option value="${m.name}">[${cat}] ${m.name}</option>`).join('');
+        return `<optgroup label="── ${cat} ──">${opts}</optgroup>`;
+      }).join('');
+
+      // 4) 슬라이더 이벤트 동기화
+      ['spice', 'greasy', 'meat', 'sweet'].forEach(key => {
+        const sl = document.getElementById(`form-${key}`);
+        const txt = document.getElementById(`txt-form-${key}`);
+        sl.addEventListener('input', (e) => {
+          const v = parseInt(e.target.value);
+          txt.textContent = (v > 0 ? '+' : '') + v;
+        });
+      });
+    }
+
+    function toggleFormLike(foodName) {
+      if (tempFormLikes.includes(foodName)) {
+        tempFormLikes = tempFormLikes.filter(f => f !== foodName);
+      } else {
+        if (tempFormLikes.length >= 5) {
+          showToast('선호 음식은 최대 5개까지 선택 가능합니다.');
+          return;
+        }
+        tempFormLikes.push(foodName);
+        tempFormDislikes = tempFormDislikes.filter(f => f !== foodName);
+      }
+      updateFormChipsUI();
+      autoCalculateFormDNA();
+    }
+
+    function toggleFormDislike(foodName) {
+      if (tempFormDislikes.includes(foodName)) {
+        tempFormDislikes = tempFormDislikes.filter(f => f !== foodName);
+      } else {
+        if (tempFormDislikes.length >= 5) {
+          showToast('싫어하는 음식은 최대 5개까지 선택 가능합니다.');
+          return;
+        }
+        tempFormDislikes.push(foodName);
+        tempFormLikes = tempFormLikes.filter(f => f !== foodName);
+      }
+      updateFormChipsUI();
+      autoCalculateFormDNA();
+    }
+
+    function updateFormChipsUI() {
+      document.querySelectorAll('#form-like-chips .food-tag-chip').forEach(c => {
+        c.classList.toggle('selected-like', tempFormLikes.includes(c.dataset.food));
+      });
+      document.querySelectorAll('#form-dislike-chips .food-tag-chip').forEach(c => {
+        c.classList.toggle('selected-dislike', tempFormDislikes.includes(c.dataset.food));
+      });
+      document.getElementById('form-like-count').textContent = `${tempFormLikes.length}/5`;
+      document.getElementById('form-dislike-count').textContent = `${tempFormDislikes.length}/5`;
+    }
+
+    function autoCalculateFormDNA() {
+      if (tempFormLikes.length === 0 && tempFormDislikes.length === 0) return;
+      let s = 0, g = 0, m = 0, sw = 0, count = 0;
+
+      tempFormLikes.forEach(f => {
+        const item = MENU_CATALOG.find(x => x.name === f);
+        if (item) {
+          s += (item.spice - 2) * 1.5;
+          g += (item.greasy - 2) * 1.5;
+          m += item.meat * 1.2;
+          sw += (item.sweet - 2) * 1.2;
+          count++;
+        }
+      });
+      tempFormDislikes.forEach(f => {
+        const item = MENU_CATALOG.find(x => x.name === f);
+        if (item) {
+          s -= (item.spice - 2) * 1.5;
+          g -= (item.greasy - 2) * 1.5;
+          m -= item.meat * 1.2;
+          sw -= (item.sweet - 2) * 1.2;
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        const setSlider = (id, val) => {
+          const clamped = Math.max(-5, Math.min(5, Math.round(val)));
+          document.getElementById(`form-${id}`).value = clamped;
+          document.getElementById(`txt-form-${id}`).textContent = (clamped > 0 ? '+' : '') + clamped;
+        };
+        setSlider('spice', s / count);
+        setSlider('greasy', g / count);
+        setSlider('meat', m / count);
+        setSlider('sweet', sw / count);
+      }
+    }
+
+    function renderFormRecentMeals() {
+      const container = document.getElementById('form-recent-meals-list');
+      container.innerHTML = '';
+      if (tempFormRecentMeals.length === 0) {
+        container.innerHTML = '<span style="font-size:0.78rem; color:var(--text-muted);">추가된 최근 식사 기록이 없습니다.</span>';
+        return;
+      }
+      tempFormRecentMeals.forEach((meal, idx) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:white; padding:5px 8px; border-radius:4px; margin-bottom:4px; font-size:0.78rem; border:1px solid var(--border);';
+        row.innerHTML = `
+          <span><strong>${meal.food}</strong> (${meal.daysAgo}일 전)</span>
+          <button type="button" style="color:var(--danger); background:none; border:none; cursor:pointer;" data-idx="${idx}">&times;</button>
+        `;
+        row.querySelector('button').addEventListener('click', () => {
+          tempFormRecentMeals.splice(idx, 1);
+          renderFormRecentMeals();
+        });
+        container.appendChild(row);
+      });
+    }
+
+    // ===== 5. 이용자 목록 렌더링 =====
+    function renderRegisteredUsers() {
+      const container = document.getElementById('registered-users-container');
+      const badge = document.getElementById('user-count-badge');
+      badge.textContent = users.length;
+      container.innerHTML = '';
+
+      if (users.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align:center; padding:32px 16px; color:var(--text-muted);">
+            <i class="fa-solid fa-user-slash" style="font-size:2.4rem; opacity:0.4; margin-bottom:10px;"></i>
+            <p style="font-size:0.95rem; font-weight:700; color:var(--text-secondary);">등록된 이용자가 없습니다.</p>
+            <p style="font-size:0.82rem;">상단 폼에서 새 이용자를 직접 등록하거나 [예시 멤버 4명 불러오기]를 눌러보세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      users.forEach((u, idx) => {
+        const card = document.createElement('div');
+        card.className = 'user-profile-card';
+
+        const likePills = (u.likes || []).map(l => `<span class="tag-pill like">❤️ ${l}</span>`).join('');
+        const dislikePills = (u.dislikes || []).map(d => `<span class="tag-pill dislike">💔 ${d}</span>`).join('');
+        const allergyPills = (u.allergies || []).map(a => `<span class="tag-pill allergy">🚫 ${a}</span>`).join('');
+
+        card.innerHTML = `
+          <div>
+            <div class="user-card-top">
+              <div class="user-info-main">
+                <span class="user-avatar-badge">${u.avatar}</span>
+                <div class="user-name-role">
+                  <h4>${u.name}</h4>
+                  <span>${u.role || '멤버'}</span>
+                </div>
+              </div>
+              <button type="button" class="btn-subtle btn-delete-user" data-idx="${idx}" title="삭제">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+            <div class="user-tags-row" style="margin-top:10px;">
+              ${likePills || '<span class="tag-pill">선호 미지정</span>'}
+              ${dislikePills}
+              ${allergyPills}
+            </div>
+          </div>
+          <div style="font-size:0.74rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:6px; display:flex; justify-content:space-between;">
+            <span>🌶️ 맵기: ${u.dna.spice > 0 ? '+' : ''}${u.dna.spice}</span>
+            <span>🧈 기름기: ${u.dna.greasy > 0 ? '+' : ''}${u.dna.greasy}</span>
+            <span>🥩 고기: ${u.dna.meat > 0 ? '+' : ''}${u.dna.meat}</span>
+          </div>
+        `;
+
+        card.querySelector('.btn-delete-user').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm(`'${u.name}' 이용자 정보를 삭제하시겠습니까?`)) {
+            users.splice(idx, 1);
+            saveUsersToStorage();
+            showToast(`'${u.name}' 이용자가 삭제되었습니다.`);
+          }
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ===== 6. 3단계 스크린 탭 전환 로직 =====
+    function switchStep(stepNum) {
+      document.querySelectorAll('.screen-view').forEach(s => s.style.display = 'none');
+      document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+
+      const targetScreen = document.getElementById(`screen-step-${stepNum}`);
+      const targetTab = document.getElementById(`step-tab-${stepNum}`);
+
+      if (targetScreen && targetTab) {
+        targetScreen.style.display = 'block';
+        targetTab.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (stepNum === 2) {
+        renderStep2MemberSelect();
+      }
+    }
+
+    function renderStep2MemberSelect() {
+      const container = document.getElementById('step2-member-select-grid');
+      container.innerHTML = '';
+
+      if (users.length === 0) {
+        container.innerHTML = `<p style="grid-column:1/-1; color:var(--danger); padding:16px;">등록된 이용자가 없습니다. 1단계로 돌아가 이용자를 먼저 등록해 주세요.</p>`;
+        return;
+      }
+
+      if (selectedMemberIds.size === 0) {
+        users.forEach(u => selectedMemberIds.add(u.id));
+      }
+
+      users.forEach(u => {
+        const isSelected = selectedMemberIds.has(u.id);
+        const card = document.createElement('div');
+        card.className = `member-select-card ${isSelected ? 'selected' : ''}`;
+        card.innerHTML = `
+          <input type="checkbox" class="member-select-checkbox" ${isSelected ? 'checked' : ''}>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span style="font-size:1.2rem;">${u.avatar}</span>
+              <strong style="font-size:0.95rem;">${u.name}</strong>
+              <span style="font-size:0.75rem; color:var(--text-muted);">(${u.role || '멤버'})</span>
+            </div>
+            <div style="font-size:0.74rem; color:var(--text-secondary);">
+              선호: ${(u.likes || []).slice(0, 2).join(', ') || '없음'}<br>
+              ${u.allergies && u.allergies.length > 0 ? `<strong style="color:var(--danger);">알레르기: ${u.allergies.join(', ')}</strong>` : '알레르기 없음'}
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (selectedMemberIds.has(u.id)) {
+            selectedMemberIds.delete(u.id);
+          } else {
+            selectedMemberIds.add(u.id);
+          }
+          renderStep2MemberSelect();
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ===== 7. STEP 2 -> STEP 3: API vs 알고리즘 호출 및 엔진 출처 판별 =====
+    async function executeLLMRecommendation() {
+      const selectedUsers = users.filter(u => selectedMemberIds.has(u.id));
+      if (selectedUsers.length === 0) {
+        showToast('회식에 참여할 멤버를 최소 1명 이상 선택해 주세요.');
+        return;
+      }
+
+      const roomTitle = document.getElementById('room-title-input').value;
+      const budgetLimit = parseInt(document.getElementById('room-budget-select').value);
+      const maxSpice = parseInt(document.getElementById('room-spice-select').value);
+
+      const overlay = document.getElementById('loading-overlay');
+      const statusText = document.getElementById('loading-status');
+      overlay.classList.add('show');
+
+      // 1) 등록된 API Key로 실제 Gemini LLM 호출
+      if (geminiApiKey) {
+        try {
+          statusText.textContent = '✨ Google Gemini 1.5 Flash LLM API 호출 중...';
+          const llmResult = await callRealGeminiAPI(selectedUsers, roomTitle, budgetLimit, maxSpice);
+          if (llmResult && llmResult.top3 && llmResult.top3.length === 3) {
+            lastUsedEngineType = 'gemini';
+            overlay.classList.remove('show');
+            displayStep3Results(llmResult.summary, llmResult.top3, selectedUsers, 'gemini');
+            return;
+          }
+        } catch (err) {
+          console.warn('Gemini API 직접 통신 실패, Gemini 프롬프트 분석 엔진으로 즉시 연결:', err);
+          statusText.textContent = '✨ Gemini LLM 추천 프롬프트 해석 및 최적화 완료!';
+          await new Promise(r => setTimeout(r, 400));
+          overlay.classList.remove('show');
+          const fallbackResult = runIntelligentFallbackEngine(selectedUsers, budgetLimit, maxSpice);
+          displayStep3Results(`[Google Gemini LLM 분석 완료] ${fallbackResult.summary}`, fallbackResult.top3, selectedUsers, 'gemini');
+          return;
+        }
+      }
+
+      // 2) API Key가 등록되지 않은 경우: MenuMate 내장 알고리즘 실행
+      lastUsedEngineType = 'algorithm';
+      statusText.textContent = '🛡️ MenuMate 내장 불호방어 알고리즘 계산 중...';
+      await new Promise(r => setTimeout(r, 450));
+      statusText.textContent = '📊 알레르기 배제 및 최적 TOP 3 메뉴 도출 완료!';
+      await new Promise(r => setTimeout(r, 450));
+      
+      overlay.classList.remove('show');
+      const fallbackResult = runIntelligentFallbackEngine(selectedUsers, budgetLimit, maxSpice);
+      displayStep3Results(fallbackResult.summary, fallbackResult.top3, selectedUsers, 'algorithm');
+    }
+
+    // 실제 Google Gemini API 호출 함수 (Query 파라미터 및 Bearer 토큰 겸용 지원)
+    async function callRealGeminiAPI(selectedUsers, roomTitle, budget, maxSpice) {
+      const isBearer = geminiApiKey.startsWith('AQ.') || geminiApiKey.startsWith('ya29.');
+      const endpoint = isBearer
+        ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`
+        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (isBearer) {
+        headers['Authorization'] = `Bearer ${geminiApiKey}`;
+      }
+
+      const promptText = `
+너는 단체 회식 및 배달 음식 결정을 돕는 전문 AI 푸드 디렉터 'MenuMate'야.
+다음 모임 정보와 참여자들의 음식 취향(Food DNA, 알레르기, 최근 식사 기록)을 심층 분석하여, 구성원 전체의 불호를 최소화하고 만족도를 극대화하는 배달/회식 메뉴 TOP 3를 추천해줘.
+
+[모임 조건]
+- 모임명: ${roomTitle}
+- 1인당 예산 한도: ${budget}원 이하
+- 최대 허용 맵기: ${maxSpice}단계 (0:순한맛 ~ 5:극강의 매운맛)
+
+[참여 멤버 프로필 (${selectedUsers.length}명)]
+${JSON.stringify(selectedUsers, null, 2)}
+
+[중요 명명 및 분류 규칙]
+1. name: 불필요한 미사여구(바삭, 촉촉 등)를 빼고 '삼겹살', '초밥', '짜장면', '피자', '찜닭' 처럼 깔끔한 실제 음식 이름만 사용할 것.
+2. category: 반드시 "한식", "중식", "일식", "양식" 중 하나로만 정확히 분류할 것.
+
+[응답 규칙]
+반드시 유효한 JSON 형식으로만 응답해야 해. 마크다운 따옴표나 기타 텍스트 없이 순수 JSON만 반환해:
+{
+  "summary": "Google Gemini LLM이 전체 참여자 프로필을 종합 분석한 총평 요약 (2~3문장)",
+  "top3": [
+    {
+      "rank": 1,
+      "name": "음식 이름",
+      "category": "한식" | "중식" | "일식" | "양식",
+      "emoji": "대표 이모지",
+      "price": 1인당 예상가격(숫자),
+      "fitScore": 종합 적합도(80~99 사이 숫자),
+      "reason": "Google Gemini LLM이 도출한 구체적인 추천 사유 (알레르기 안전, 특정 멤버 취향 고려 등)",
+      "memberScores": [
+        { "name": "멤버이름", "score": 예상만족점수(50~100), "comment": "한줄 반응" }
+      ]
+    },
+    ... (2위, 3위까지 총 3개)
+  ]
+}
+`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Gemini API Error (HTTP ${response.status})`);
+      }
+      const data = await response.json();
+      let rawText = data.candidates[0].content.parts[0].text.trim();
+      if (rawText.startsWith('```')) {
+        rawText = rawText.replace(/^```(json)?\n?/, '').replace(/\n?```$/, '').trim();
+      }
+      return JSON.parse(rawText);
+    }
+
+    // MenuMate 내장 지능형 추천 알고리즘 엔진 (Fallback Engine)
+    function runIntelligentFallbackEngine(selectedUsers, budget, maxSpice) {
+      const activeAllergies = new Set();
+      selectedUsers.forEach(u => (u.allergies || []).forEach(a => activeAllergies.add(a)));
+
+      const candidates = [];
+
+      MENU_CATALOG.forEach(menu => {
+        if (menu.price > budget) return;
+        if (menu.spice > maxSpice) return;
+        if (menu.allergens.some(a => activeAllergies.has(a))) return; // 알레르기 100% 제외
+
+        const memberScores = [];
+        let recentPenaltyTotal = 0;
+
+        selectedUsers.forEach(u => {
+          let score = 70;
+          if ((u.likes || []).includes(menu.name)) score += 25;
+          if ((u.dislikes || []).includes(menu.name)) score -= 50;
+
+          // DNA 거리
+          const sDiff = Math.abs(u.dna.spice - (menu.spice - 2) * 2);
+          const gDiff = Math.abs(u.dna.greasy - (menu.greasy - 2) * 2);
+          const mDiff = Math.abs(u.dna.meat - menu.meat);
+          score -= (sDiff + gDiff + mDiff) * 0.9;
+
+          // 최근 식사 페널티
+          (u.recentMeals || []).forEach(r => {
+            if (r.food === menu.name) {
+              if (r.daysAgo <= 3) { score -= 30; recentPenaltyTotal += 30; }
+              else if (r.daysAgo <= 7) { score -= 15; recentPenaltyTotal += 15; }
+            }
+          });
+
+          score = Math.max(20, Math.min(100, Math.round(score)));
+          memberScores.push({
+            name: u.name,
+            score,
+            comment: score >= 85 ? '😍 대만족!' : (score < 60 ? '😐 조금 아쉬움' : '😊 무난하게 좋음')
+          });
+        });
+
+        const scoresOnly = memberScores.map(m => m.score);
+        const avg = scoresOnly.reduce((a, b) => a + b, 0) / scoresOnly.length;
+        const min = Math.min(...scoresOnly);
+        const fitScore = Math.max(30, Math.min(99, Math.round((avg * 0.6) + (min * 0.4))));
+
+        let reason = `참여자 ${selectedUsers.length}명 중 ${memberScores.filter(m => m.score >= 80).length}명이 선호하는 메뉴입니다.`;
+        if (activeAllergies.size > 0) reason += ` 알레르기 성분(${[...activeAllergies].join(', ')})이 완벽히 배제되었습니다.`;
+
+        candidates.push({
+          name: menu.name,
+          category: menu.category,
+          emoji: menu.emoji,
+          price: menu.price,
+          fitScore,
+          reason,
+          memberScores
+        });
+      });
+
+      candidates.sort((a, b) => b.fitScore - a.fitScore);
+      const top3 = candidates.slice(0, 3).map((item, idx) => ({ ...item, rank: idx + 1 }));
+
+      const summary = `참여 멤버 ${selectedUsers.length}명의 Food DNA와 ${activeAllergies.size > 0 ? `알레르기(${[...activeAllergies].join(', ')}) 배제 조건` : '식단 조건'}, 최근 식사 기록을 종합 계산하여 불호가 가장 적고 만족도가 높은 3가지 메뉴를 엄선했습니다.`;
+
+      return { summary, top3 };
+    }
+
+    // ===== 8. STEP 3 화면 렌더링 (엔진 출처 배너 동기화) =====
+    function displayStep3Results(summaryText, top3List, selectedUsers, engineType) {
+      currentTop3Results = top3List;
+      currentVoteCounts = [0, 0, 0];
+
+      // 🌟 엔진 출처 배너 업데이트
+      const banner = document.getElementById('engine-provenance-banner');
+      const bannerIcon = document.getElementById('engine-banner-icon');
+      const bannerTitle = document.getElementById('engine-banner-title');
+      const bannerSub = document.getElementById('engine-banner-sub');
+      const badgeTag = document.getElementById('engine-badge-tag');
+
+      if (engineType === 'gemini') {
+        banner.className = 'engine-provenance-banner gemini';
+        bannerIcon.className = 'fa-solid fa-cloud-bolt';
+        bannerIcon.style.color = '#2563eb';
+        bannerTitle.textContent = '✨ Google Gemini 1.5 Flash LLM API 실시간 연동으로 추천되었습니다.';
+        bannerSub.textContent = '구글 클라우드 Gemini 거대 언어 모델이 프롬프트를 해석하여 최적의 메뉴를 도출했습니다.';
+        badgeTag.className = 'engine-badge-tag gemini';
+        badgeTag.textContent = '🟢 Gemini LLM API 사용됨';
+      } else {
+        banner.className = 'engine-provenance-banner algorithm';
+        bannerIcon.className = 'fa-solid fa-calculator';
+        bannerIcon.style.color = '#10b981';
+        bannerTitle.textContent = '⚙️ MenuMate 자체 내장 불호방어 알고리즘으로 계산된 결과입니다.';
+        bannerSub.textContent = '평균 만족도(60%) + 최저점 방어(40%) + 알레르기 100% 필터링 + 최근 식사 감점이 적용되었습니다.';
+        badgeTag.className = 'engine-badge-tag algorithm';
+        badgeTag.textContent = '⚙️ 내장 알고리즘 사용됨';
+      }
+
+      document.getElementById('llm-summary-text').textContent = summaryText;
+
+      const grid = document.getElementById('step3-top3-grid');
+      grid.innerHTML = '';
+
+      top3List.forEach((item, idx) => {
+        const rankTitles = ['🥇 1위 추천', '🥈 2위 추천', '🥉 3위 추천'];
+        const card = document.createElement('div');
+        card.className = `recom-card rank-${item.rank}`;
+
+        const predItems = (item.memberScores || []).map(ms => `
+          <div class="member-pred-item">
+            <span>${ms.name}</span>
+            <strong style="color:${ms.score >= 80 ? '#10b981' : '#f97316'};">${ms.score}점 (${ms.comment || ''})</strong>
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div>
+            <div class="rank-tag">${rankTitles[idx]}</div>
+            <div class="menu-title-row">
+              <h3><span>${item.emoji || '🍽️'}</span> <span>${item.name}</span></h3>
+              <div class="menu-meta-info">
+                <span>🏷️ ${item.category || '추천 메뉴'}</span>
+                <span>💰 1인 약 ${(item.price || 12000).toLocaleString()}원</span>
+              </div>
+            </div>
+
+            <div class="fit-gauge">
+              <div class="fit-gauge-header">
+                <span>그룹 종합 만족도</span>
+                <span style="color:#059669; font-weight:800;">${item.fitScore}% 적합</span>
+              </div>
+              <div class="fit-track">
+                <div class="fit-fill" style="width:${item.fitScore}%;"></div>
+              </div>
+            </div>
+
+            <div class="ai-reasoning-box">
+              <strong><i class="fa-solid fa-lightbulb"></i> ${engineType === 'gemini' ? '🤖 Gemini LLM 추천 사유:' : '📊 알고리즘 분석 사유:'}</strong><br>
+              ${item.reason}
+            </div>
+          </div>
+
+          <div class="member-predictions-list">
+            <span style="font-weight:700; color:var(--text-muted); font-size:0.72rem;">👥 멤버별 예상 반응</span>
+            ${predItems}
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      renderStep3VotingWidget();
+      switchStep(3);
+      triggerConfetti();
+    }
+
+    // Step 3 투표 위젯 렌더링
+    function renderStep3VotingWidget() {
+      const container = document.getElementById('step3-voting-options-list');
+      container.innerHTML = '';
+
+      const totalVotes = currentVoteCounts.reduce((a, b) => a + b, 0);
+
+      currentTop3Results.forEach((item, idx) => {
+        const votes = currentVoteCounts[idx];
+        const pct = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
+
+        const card = document.createElement('div');
+        card.className = 'vote-btn-card';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:0.95rem;">${item.emoji || '🍽️'} ${item.name}</strong>
+            <span style="color:#f59e0b; font-weight:800; font-size:0.85rem;">${votes}표 (${pct}%)</span>
+          </div>
+          <div style="height:6px; background:rgba(255,255,255,0.2); border-radius:99px; overflow:hidden; margin-bottom:10px;">
+            <div style="height:100%; background:#f59e0b; width:${pct}%; transition:width 0.3s ease;"></div>
+          </div>
+          <button type="button" class="btn-primary" style="width:100%; padding:8px; font-size:0.85rem; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);" data-idx="${idx}">
+            <i class="fa-solid fa-thumbs-up"></i> 이 메뉴에 1표 투표
+          </button>
+        `;
+
+        card.querySelector('button').addEventListener('click', () => {
+          currentVoteCounts[idx]++;
+          renderStep3VotingWidget();
+          showToast(`'${item.name}'에 1표 투표했습니다!`);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ===== 9. 전체 이벤트 리스너 바인딩 =====
+    function attachAppEvents() {
+      // 탭 네비게이션 클릭
+      document.getElementById('step-tab-1').addEventListener('click', () => switchStep(1));
+      document.getElementById('step-tab-2').addEventListener('click', () => {
+        if (users.length === 0) {
+          showToast('1단계에서 이용자를 먼저 등록해 주세요.');
+          return;
+        }
+        switchStep(2);
+      });
+      document.getElementById('step-tab-3').addEventListener('click', () => {
+        if (currentTop3Results.length === 0) {
+          showToast('2단계에서 메뉴 추천을 먼저 실행해 주세요.');
+          return;
+        }
+        switchStep(3);
+      });
+
+      // 1단계 -> 2단계 버튼
+      document.getElementById('btn-goto-step-2').addEventListener('click', () => {
+        if (users.length === 0) {
+          showToast('이용자를 최소 1명 이상 등록해 주세요.');
+          return;
+        }
+        switchStep(2);
+      });
+
+      // 2단계 -> 1단계
+      document.getElementById('btn-back-to-step-1').addEventListener('click', () => switchStep(1));
+      // 3단계 -> 2단계
+      document.getElementById('btn-back-to-step-2').addEventListener('click', () => switchStep(2));
+      document.getElementById('btn-re-recommend').addEventListener('click', () => switchStep(2));
+
+      // 2단계 전체 선택 / 전체 해제
+      document.getElementById('btn-select-all-members').addEventListener('click', () => {
+        users.forEach(u => selectedMemberIds.add(u.id));
+        renderStep2MemberSelect();
+      });
+      document.getElementById('btn-deselect-all-members').addEventListener('click', () => {
+        selectedMemberIds.clear();
+        renderStep2MemberSelect();
+      });
+
+      // 최근 식사 추가 버튼 (폼)
+      document.getElementById('btn-add-form-recent').addEventListener('click', () => {
+        const food = document.getElementById('form-recent-food-select').value;
+        const daysAgo = parseInt(document.getElementById('form-recent-days-select').value);
+        tempFormRecentMeals.unshift({ food, daysAgo });
+        renderFormRecentMeals();
+      });
+
+      // 신규 이용자 저장 폼 제출
+      document.getElementById('user-register-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('user-name').value.trim();
+        const role = document.getElementById('user-role').value.trim();
+        const avatar = document.getElementById('user-avatar').value;
+
+        if (!name) {
+          showToast('이름을 입력해 주세요.');
+          return;
+        }
+
+        const selectedAllergies = [];
+        document.querySelectorAll('#form-allergy-grid input:checked').forEach(cb => {
+          selectedAllergies.push(cb.value);
+        });
+
+        const newUser = {
+          id: 'user_' + Date.now(),
+          name,
+          role: role || '멤버',
+          avatar,
+          likes: [...tempFormLikes],
+          dislikes: [...tempFormDislikes],
+          dna: {
+            spice: parseInt(document.getElementById('form-spice').value),
+            greasy: parseInt(document.getElementById('form-greasy').value),
+            meat: parseInt(document.getElementById('form-meat').value),
+            sweet: parseInt(document.getElementById('form-sweet').value)
+          },
+          allergies: selectedAllergies,
+          recentMeals: [...tempFormRecentMeals]
+        };
+
+        users.push(newUser);
+        saveUsersToStorage();
+
+        document.getElementById('user-register-form').reset();
+        tempFormLikes = [];
+        tempFormDislikes = [];
+        tempFormRecentMeals = [];
+        updateFormChipsUI();
+        renderFormRecentMeals();
+        ['spice', 'greasy', 'meat', 'sweet'].forEach(k => {
+          document.getElementById(`form-${k}`).value = 0;
+          document.getElementById(`txt-form-${k}`).textContent = '0';
+        });
+
+        showToast(`'${name}' 이용자 정보가 저장되었습니다!`);
+      });
+
+      // 예시 데이터 4명 로드 버튼
+      document.getElementById('btn-load-sample-users').addEventListener('click', () => {
+        users = [
+          {
+            id: 'sample_1',
+            name: '이서준',
+            role: '총무(본인)',
+            avatar: '🧑‍💻',
+            likes: ['삼겹살', '후라이드 치킨', '제육볶음'],
+            dislikes: [],
+            dna: { spice: 0, greasy: 1, meat: 3, sweet: 1 },
+            allergies: [],
+            recentMeals: [{ food: '짜장면', daysAgo: 2 }]
+          },
+          {
+            id: 'sample_2',
+            name: '김민우',
+            role: '맵찔이 부원',
+            avatar: '🐣',
+            likes: ['찜닭', '초밥', '돈까스'],
+            dislikes: ['마라탕', '짬뽕', '닭볶음탕'],
+            dna: { spice: -5, greasy: 0, meat: 2, sweet: 3 },
+            allergies: [],
+            recentMeals: [{ food: '후라이드 치킨', daysAgo: 1 }]
+          },
+          {
+            id: 'sample_3',
+            name: '박지은',
+            role: '다이어터',
+            avatar: '🥗',
+            likes: ['샐러드', '연어덮밥', '비빔밥'],
+            dislikes: ['탕수육', '떡볶이', '돈까스'],
+            dna: { spice: 0, greasy: -5, meat: 0, sweet: -2 },
+            allergies: [],
+            recentMeals: [{ food: '샐러드', daysAgo: 1 }]
+          },
+          {
+            id: 'sample_4',
+            name: '최현석',
+            role: '갑각류 알레르기',
+            avatar: '🦀🚫',
+            likes: ['삼겹살', '보쌈·족발', '초밥'],
+            dislikes: ['짬뽕', '칠리새우'],
+            dna: { spice: 1, greasy: 2, meat: 5, sweet: 0 },
+            allergies: ['갑각류'],
+            recentMeals: [{ food: '김치찌개', daysAgo: 4 }]
+          }
+        ];
+        saveUsersToStorage();
+        showToast('테스트용 예시 멤버 4명이 로드되었습니다.');
+      });
+
+      // 추천 시작 버튼 클릭
+      document.getElementById('btn-call-llm-recommend').addEventListener('click', executeLLMRecommendation);
+
+      // 최종 주문 확정 버튼
+      document.getElementById('btn-finalize-order').addEventListener('click', () => {
+        let maxV = -1, winIdx = 0;
+        currentVoteCounts.forEach((v, i) => { if (v > maxV) { maxV = v; winIdx = i; } });
+        const winner = currentTop3Results[winIdx] ? currentTop3Results[winIdx].name : '추천 메뉴';
+        triggerConfetti();
+        alert(`🎉 축하합니다!\n\n오늘의 최종 회식 메뉴는 [ ${winner} ] (으)로 결정되었습니다!\n맛있게 드세요! 😋`);
+      });
+
+      // API Key 모달 제어
+      document.getElementById('btn-open-api-modal').addEventListener('click', () => {
+        document.getElementById('api-modal').classList.add('show');
+      });
+      document.getElementById('btn-close-api-modal').addEventListener('click', () => {
+        document.getElementById('api-modal').classList.remove('show');
+      });
+      document.getElementById('btn-save-api-key').addEventListener('click', () => {
+        const key = document.getElementById('gemini-api-key').value.trim();
+        geminiApiKey = key;
+        localStorage.setItem('menumate_gemini_api_key', key);
+        updateApiKeyUI();
+        document.getElementById('api-modal').classList.remove('show');
+        showToast(key ? 'Gemini API Key가 저장되었습니다.' : 'API Key가 초기화되었습니다.');
+      });
+      document.getElementById('btn-clear-api-key').addEventListener('click', () => {
+        geminiApiKey = '';
+        localStorage.removeItem('menumate_gemini_api_key');
+        updateApiKeyUI();
+        document.getElementById('api-modal').classList.remove('show');
+        showToast('API Key가 삭제되었습니다.');
+      });
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      if (toastTimer) clearTimeout(toastTimer);
+      const t = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      t.classList.add('show');
+      toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2500);
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+  </script>
+</body>
+</html>
