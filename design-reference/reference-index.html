@@ -1,0 +1,219 @@
+<html lang="ko"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="종이 질감·두꺼운 외곽선·하드 섀도를 쓰는 레트로 인쇄물 스타일 디자인 레퍼런스 데모 페이지">
+    <meta name="theme-color" content="#f3b941">
+    <meta property="og:title" content="Paper UI · 디자인 레퍼런스">
+    <meta property="og:description" content="색상, 타이포그래피, 카드, 미터, 버튼 인터랙션을 한 화면에서 확인하는 예시 페이지입니다.">
+    <meta property="og:image" content="/assets/hero.webp">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./reference-styles.css">
+    <title>Paper UI 디자인 레퍼런스</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#choice">본문으로 바로 가기</a>
+
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="샘플 브랜드 홈">
+        <span class="brand-coin" aria-hidden="true">◆</span>
+        <span>
+          <strong>브랜드</strong>
+          <small>SAMPLE BRAND</small>
+        </span>
+      </a>
+      <div class="header-actions" id="auth-area" aria-live="polite">
+
+    <a class="google-button" href="#">
+      <span class="google-icon" aria-hidden="true">G</span>
+      로그인 버튼 예시
+    </a>
+  </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-art" src="/assets/hero.webp" alt="히어로 영역 예시 이미지 (이 묶음에는 포함돼 있지 않음)" width="1600" height="900">
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <span class="eyebrow"><i aria-hidden="true"></i> 작은 라벨 · EYEBROW 예시</span>
+          <h1 id="hero-title">큰 제목이<br><em>이렇게</em><br><span class="hero-punch">들어갑니다.</span></h1>
+          <p>
+            히어로 본문 문단 예시입니다. 두 줄 정도 길이로 보이는 모습을 확인합니다.<br>
+            글자 크기와 줄 간격, 그림자 처리를 함께 볼 수 있습니다.
+          </p>
+          <a class="hero-cta" href="#choice">주요 버튼 예시 <span aria-hidden="true">↓</span></a>
+        </div>
+        <aside class="hero-stamp" aria-label="도장 장식 예시">
+          <b>도장<br>장식</b>
+          <span>STAMP</span>
+        </aside>
+      </section>
+
+      <section class="round-strip" aria-label="상단 정보 띠 예시">
+        <div class="round-title">
+          <span class="live-dot" aria-hidden="true"></span>
+          <div>
+            <small id="round-kicker">작은 라벨</small>
+            <strong id="round-date">굵은 제목 텍스트</strong>
+          </div>
+        </div>
+        <div class="countdown-box">
+          <small id="countdown-label">보조 라벨</small>
+          <strong id="countdown">00:00:00</strong>
+        </div>
+        <div class="mode-box">
+          <small>상태 배지</small>
+          <strong id="trade-mode" class="mode-badge live">배지 예시</strong>
+        </div>
+      </section>
+
+      <section class="vote-section" id="choice" aria-labelledby="choice-title">
+        <div class="section-heading">
+          <div>
+            <span class="scribble">SECTION LABEL</span>
+            <h2 id="choice-title">섹션 제목이 들어갑니다</h2>
+          </div>
+          <p id="choice-guidance">섹션 오른쪽에 붙는 보조 설명 문단입니다. 두 줄 정도가 적당합니다.</p>
+        </div>
+
+        <div class="vote-grid" id="choice-grid">
+          <article class="vote-card vote-card--opt-a" data-choice-card="A">
+            <div class="card-tape" aria-hidden="true"></div>
+            <div class="vote-art-wrap">
+              <img src="/assets/card-a.webp" alt="카드 A 예시 이미지 (이 묶음에는 포함돼 있지 않음)" width="900" height="900">
+              <span class="card-number">01</span>
+              <span class="ticker">A</span>
+            </div>
+            <div class="vote-card-body">
+              <div>
+                <span class="card-kicker">카드 위 작은 라벨</span>
+                <h3>선택지 A</h3>
+                <p>카드 본문 설명이 들어가는 자리입니다. 한두 줄 길이를 가정합니다.</p>
+              </div>
+              <div class="vote-meter" aria-label="선택지 A 진행률 예시">
+                <div class="meter-copy">
+                  <b><span data-count="A">62</span>표</b>
+                  <span data-percent="A">62%</span>
+                </div>
+                <div class="meter-track"><i data-bar="A" style="width: 62%;"></i></div>
+              </div>
+              <button class="vote-button" type="button" data-choice="A">
+                <span>버튼 라벨</span><b aria-hidden="true">↗</b>
+              </button>
+            </div>
+          </article>
+
+          <article class="vote-card vote-card--opt-b" data-choice-card="B">
+            <div class="card-tape" aria-hidden="true"></div>
+            <div class="vote-art-wrap">
+              <img src="/assets/card-b.webp" alt="카드 B 예시 이미지 (이 묶음에는 포함돼 있지 않음)" width="900" height="900">
+              <span class="card-number">02</span>
+              <span class="ticker">B</span>
+            </div>
+            <div class="vote-card-body">
+              <div>
+                <span class="card-kicker">카드 위 작은 라벨</span>
+                <h3>선택지 B</h3>
+                <p>같은 구조에서 강조 색만 달라졌을 때의 모습을 확인합니다.</p>
+              </div>
+              <div class="vote-meter" aria-label="선택지 B 진행률 예시">
+                <div class="meter-copy">
+                  <b><span data-count="B">28</span>표</b>
+                  <span data-percent="B">28%</span>
+                </div>
+                <div class="meter-track"><i data-bar="B" style="width: 28%;"></i></div>
+              </div>
+              <button class="vote-button" type="button" data-choice="B">
+                <span>버튼 라벨</span><b aria-hidden="true">↘</b>
+              </button>
+            </div>
+          </article>
+
+          <article class="vote-card vote-card--opt-c" data-choice-card="C">
+            <div class="card-tape" aria-hidden="true"></div>
+            <div class="vote-art-wrap">
+              <img src="/assets/card-c.webp" alt="카드 C 예시 이미지 (이 묶음에는 포함돼 있지 않음)" width="900" height="900">
+              <span class="card-number">03</span>
+              <span class="ticker">C</span>
+            </div>
+            <div class="vote-card-body">
+              <div>
+                <span class="card-kicker">카드 위 작은 라벨</span>
+                <h3>선택지 C</h3>
+                <p>세 번째 카드입니다. 좁은 화면에서 배치가 어떻게 바뀌는지 보세요.</p>
+              </div>
+              <div class="vote-meter" aria-label="선택지 C 진행률 예시">
+                <div class="meter-copy">
+                  <b><span data-count="C">10</span>표</b>
+                  <span data-percent="C">10%</span>
+                </div>
+                <div class="meter-track"><i data-bar="C" style="width: 10%;"></i></div>
+              </div>
+              <button class="vote-button" type="button" data-choice="C">
+                <span>버튼 라벨</span><b aria-hidden="true">—</b>
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="vote-footnote">
+          <span>각주 왼쪽 문장입니다. 굵게 <b>강조</b>도 들어갑니다.</span>
+          <span>각주 오른쪽 문장입니다. <b>보조 정보</b>를 둡니다.</span>
+        </div>
+      </section>
+
+      <section class="ledger" aria-labelledby="panel-title">
+        <div class="ledger-paper">
+          <div class="ledger-heading">
+            <div>
+              <span class="scribble">PANEL LABEL</span>
+              <h2 id="panel-title">괘선 종이 패널</h2>
+            </div>
+            <span class="ledger-seal" aria-hidden="true">도장</span>
+          </div>
+          <div id="panel-empty" class="empty-ledger" hidden="">
+            <span aria-hidden="true">📄</span>
+            <p>빈 상태 문구가 들어가는 자리입니다.<br>두 줄 정도를 가정합니다.</p>
+          </div>
+          <dl id="panel-detail" class="execution-detail">
+            <div><dt>항목 1</dt><dd id="panel-1">값 예시</dd></div>
+            <div><dt>항목 2</dt><dd id="panel-2">값 예시</dd></div>
+            <div><dt>항목 3</dt><dd id="panel-3">값 예시</dd></div>
+            <div><dt>항목 4</dt><dd id="panel-4">값 예시</dd></div>
+            <div><dt>항목 5</dt><dd id="panel-5">값 예시</dd></div>
+            <div><dt>항목 6</dt><dd id="panel-6">값 예시</dd></div>
+          </dl>
+          <p id="panel-note" class="execution-note">패널 아래 붙는 점선 테두리 보조 설명 문단입니다.</p>
+        </div>
+        <aside class="rules-card">
+          <span class="rules-pin" aria-hidden="true"></span>
+          <h2>번호 목록 카드</h2>
+          <ol>
+            <li><b>첫 번째 항목</b><span>항목 아래 붙는 보조 설명</span></li>
+            <li><b>두 번째 항목</b><span>항목 아래 붙는 보조 설명</span></li>
+            <li><b>세 번째 항목</b><span>항목 아래 붙는 보조 설명</span></li>
+            <li><b>네 번째 항목</b><span>항목 아래 붙는 보조 설명</span></li>
+          </ol>
+          <p>※ 카드 맨 아래에 들어가는 아주 작은 글씨의 단서 문장입니다.</p>
+        </aside>
+      </section>
+
+      <section class="risk-banner" aria-label="강조 배너 예시">
+        <strong>⚠ 강조 배너 제목</strong>
+        <p>
+          배경색이 진한 배너 영역입니다. 경고나 안내처럼 눈에 띄어야 하는 문장을 둡니다.
+          두 문장 정도 길이에서 어떻게 보이는지 확인할 수 있습니다.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">브랜드 <span>SAMPLE</span></div>
+      <p>푸터 첫 번째 문장입니다.</p>
+      <p><a class="footer-link" href="#">푸터 링크 예시</a></p>
+      <p class="footer-fine">© YEAR SAMPLE BRAND · FOOTER FINE PRINT</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden=""></div>
+
+</body></html>
