@@ -7,14 +7,6 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/",
-      "dest": "/menumate_v2.html"
-    },
-    {
-      "src": "/v2",
-      "dest": "/menumate_v2.html"
-    },
-    {
       "src": "/(.*)",
       "dest": "/$1"
     }
