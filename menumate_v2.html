@@ -974,28 +974,32 @@
       </div>
     </header>
 
-    <!-- 3-Step Wizard Navigation Bar -->
+    <!-- 4-Step Wizard Navigation Bar -->
     <nav class="step-wizard">
       <div id="step-tab-1" class="step-tab active" data-step="1">
         <span class="step-num">1</span>
-        <span class="step-text">이용자 정보 저장</span>
+        <span class="step-text">이용자 취향 등록</span>
       </div>
       <div id="step-tab-2" class="step-tab" data-step="2">
         <span class="step-num">2</span>
-        <span class="step-text">멤버 선택 & 분석 요청</span>
+        <span class="step-text">등록된 멤버 목록</span>
       </div>
       <div id="step-tab-3" class="step-tab" data-step="3">
         <span class="step-num">3</span>
+        <span class="step-text">멤버 선택 & 분석</span>
+      </div>
+      <div id="step-tab-4" class="step-tab" data-step="4">
+        <span class="step-num">4</span>
         <span class="step-text">추천 결과 & 투표</span>
       </div>
     </nav>
 
     <!-- ==========================================
-         STEP 1: 이용자 정보 저장 화면
+         STEP 1: 이용자 정보 저장 화면 (입력창만 노출)
          ========================================== -->
     <section id="screen-step-1" class="screen-view">
       <!-- 1) 신규 이용자 정보 등록 폼 -->
-      <div class="card" style="margin-bottom: 20px;">
+      <div class="card">
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-user-plus"></i> 이용자 음식 취향 프로필 등록</span>
           <span id="storage-mode-indicator" style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">
@@ -1110,12 +1114,22 @@
               <button type="submit" id="btn-submit-user-form" class="btn-primary" style="width: 100%; margin-top: 10px;">
                 <i class="fa-solid fa-cloud-arrow-up"></i> 이용자 정보 저장하기 (DB 동기화)
               </button>
+              
+              <div style="display: flex; gap: 10px; margin-top: 12px;">
+                <button type="button" id="btn-goto-step-2" class="btn-secondary" style="flex: 1; justify-content: center; padding: 12px;">
+                  <i class="fa-solid fa-users"></i> 등록된 멤버 목록 보기
+                </button>
+              </div>
             </div>
           </div>
         </form>
       </div>
+    </section>
 
-      <!-- 2) 저장된 이용자 목록 카드 -->
+    <!-- ==========================================
+         STEP 2: 등록된 이용자 목록 화면 (멤버 관리 전용 페이지)
+         ========================================== -->
+    <section id="screen-step-2" class="screen-view" style="display:none;">
       <div class="card">
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-users"></i> 등록된 이용자 목록 (<span id="user-count-badge">0</span>명)</span>
@@ -1126,8 +1140,11 @@
 
         <div id="registered-users-container" class="users-grid-display"></div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-          <button type="button" id="btn-goto-step-2" class="btn-primary" style="font-size:1.05rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; border-top: 2px dashed var(--paper-dark); padding-top: 20px;">
+          <button type="button" id="btn-back-to-step-1" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 등록 폼으로 돌아가기
+          </button>
+          <button type="button" id="btn-goto-step-3" class="btn-primary" style="font-size:1.05rem;">
             <span>다음 단계: 회식 멤버 선택하기</span> <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
@@ -1135,9 +1152,9 @@
     </section>
 
     <!-- ==========================================
-         STEP 2: 이용자 선택 & 분석 시작 화면
+         STEP 3: 이번 회식 참여 멤버 선택 & 분석 요청 화면
          ========================================== -->
-    <section id="screen-step-2" class="screen-view" style="display:none;">
+    <section id="screen-step-3" class="screen-view" style="display:none;">
       <div class="card">
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-user-check"></i> 이번 회식/주문에 참여할 이용자 선택</span>
@@ -1183,8 +1200,8 @@
 
         <!-- 액션 버튼 바 -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
-          <button type="button" id="btn-back-to-step-1" class="btn-secondary">
-            <i class="fa-solid fa-arrow-left"></i> 이용자 관리로 돌아가기
+          <button type="button" id="btn-back-to-step-2" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 멤버 목록으로 돌아가기
           </button>
           <button type="button" id="btn-call-llm-recommend" class="btn-primary" style="padding:16px 28px; font-size:1.1rem;">
             <i class="fa-solid fa-wand-magic-sparkles"></i> <span>선택된 멤버 취향으로 최적 메뉴 추천 시작</span>
@@ -1194,9 +1211,9 @@
     </section>
 
     <!-- ==========================================
-         STEP 3: 추천 결과 띄워주는 화면 (스마트 재추천 지원)
+         STEP 4: 추천 결과 띄워주는 화면 (스마트 재추천 지원)
          ========================================== -->
-    <section id="screen-step-3" class="screen-view" style="display:none;">
+    <section id="screen-step-4" class="screen-view" style="display:none;">
       <div class="card">
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
@@ -1907,7 +1924,7 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
       });
     }
 
-    // ===== 6. 3단계 스크린 탭 전환 로직 =====
+    // ===== 6. 4단계 스크린 탭 전환 로직 =====
     function switchStep(stepNum) {
       document.querySelectorAll('.screen-view').forEach(s => s.style.display = 'none');
       document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
@@ -1921,7 +1938,7 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      if (stepNum === 2) {
+      if (stepNum === 3) {
         renderStep2MemberSelect();
       }
     }
@@ -2299,7 +2316,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       });
 
       renderStep3VotingWidget();
-      switchStep(3);
+      switchStep(4);
       triggerConfetti();
 
       if (isRefresh) {
