@@ -1169,30 +1169,40 @@
   </div>
 
   <!-- ==========================================
-       MODAL 1: Supabase Cloud DB 설정 모달
+       MODAL 1: Supabase Cloud DB 연동 상태 모달
        ========================================== -->
   <div id="db-modal" class="modal-backdrop">
     <div class="modal-card">
       <div class="section-title" style="margin-bottom:12px;">
-        <span class="left"><i class="fa-solid fa-database" style="color:#3ecf8e;"></i> Supabase Cloud DB 연동 설정</span>
+        <span class="left"><i class="fa-solid fa-database" style="color:#3ecf8e;"></i> Supabase Cloud DB 연동 상태</span>
         <button type="button" id="btn-close-db-modal" style="background:none; border:none; font-size:1.3rem; cursor:pointer;">&times;</button>
       </div>
 
-      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
-        Supabase 프로젝트의 <strong>Project URL</strong>과 <strong>anon public API Key</strong>를 입력하시면, 이용자의 음식 취향 데이터가 클라우드 PostgreSQL DB에 영구 저장됩니다.
-      </p>
-
-      <div class="form-group">
-        <label class="form-label" for="supabase-url">Supabase Project URL</label>
-        <input type="text" id="supabase-url" class="form-control" placeholder="https://xyzcompany.supabase.co">
+      <!-- 현재 연동 상태 -->
+      <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px;">
+        <p style="font-size:0.82rem; font-weight:700; color:var(--text-primary); margin-bottom:6px;">
+          <i class="fa-solid fa-circle-info" style="color:#3b82f6;"></i> 연동 방식 안내
+        </p>
+        <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.6;">
+          Supabase 연결 정보(<code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>)는 보안을 위해 <strong>Vercel 환경변수</strong>에서만 관리됩니다.<br>
+          HTML 코드나 브라우저 저장소에는 저장되지 않습니다.
+        </p>
+        <p id="db-vercel-status" style="font-size:0.85rem; font-weight:700; margin-top:10px; padding:8px 10px; background:white; border-radius:6px; border:1px solid var(--border);"></p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="supabase-anon-key">Supabase Anon Public API Key</label>
-        <input type="password" id="supabase-anon-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+      <!-- Vercel 환경변수 등록 가이드 -->
+      <div style="background:var(--bg-subtle); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); margin-bottom:14px;">
+        <strong style="font-size:0.82rem; color:var(--text-primary);"><i class="fa-solid fa-gear"></i> Vercel 환경변수 등록 방법</strong>
+        <ol style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px; padding-left:18px; line-height:1.8;">
+          <li>Vercel 대시보드 → 프로젝트 선택 → <strong>Settings → Environment Variables</strong></li>
+          <li><code>SUPABASE_URL</code> = <em>https://your-project.supabase.co</em> 추가</li>
+          <li><code>SUPABASE_ANON_KEY</code> = <em>eyJ...</em> 추가</li>
+          <li>저장 후 <strong>Redeploy</strong> (재배포) 하면 자동 연결됩니다.</li>
+        </ol>
       </div>
 
-      <div style="background:var(--bg-subtle); padding:12px; border-radius:var(--radius-sm); margin-top:14px; border:1px solid var(--border);">
+      <!-- SQL 테이블 생성 쿼리 -->
+      <div style="background:var(--bg-subtle); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <strong style="font-size:0.82rem; color:var(--text-primary);"><i class="fa-solid fa-terminal"></i> Supabase SQL Editor 테이블 생성 쿼리</strong>
           <button type="button" id="btn-copy-sql" class="btn-secondary" style="font-size:0.72rem; padding:3px 8px;">
@@ -1219,10 +1229,9 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
         </p>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
-        <button type="button" id="btn-disconnect-db" class="btn-secondary">연결 해제 (로컬 모드)</button>
-        <button type="button" id="btn-save-db-config" class="btn-primary" style="background:#3ecf8e; color:#0f172a;">
-          <i class="fa-solid fa-plug"></i> DB 연결 및 동기화
+      <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+        <button type="button" id="btn-close-db-modal-bottom" class="btn-primary" style="background:#3ecf8e; color:#0f172a;">
+          <i class="fa-solid fa-check"></i> 확인
         </button>
       </div>
     </div>
@@ -1324,13 +1333,12 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
     let currentVoteCounts = [0, 0, 0];
     let excludedMenuNames = new Set();
 
-    // Supabase DB 클라이언트 상태
+    // Supabase DB 클라이언트 상태 (Vercel 환경변수 /api/config 에서만 로드)
     let supabaseClient = null;
-    let supabaseUrl = localStorage.getItem('menumate_supabase_url') || '';
-    let supabaseAnonKey = localStorage.getItem('menumate_supabase_key') || '';
+    let supabaseUrl = '';       // localStorage 미사용 - Vercel 환경변수로만 주입
+    let supabaseAnonKey = '';   // localStorage 미사용 - Vercel 환경변수로만 주입
 
     // LLM API 키 상태 (사용자 직접 입력 또는 Vercel 환경 변수로 주입)
-    let DEFAULT_KEY = '';
     let geminiApiKey = localStorage.getItem('menumate_gemini_api_key') || '';
     let lastUsedEngineType = 'gemini'; // 'gemini' | 'algorithm'
 
@@ -1349,30 +1357,27 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
     });
 
     // Vercel Serverless Function (/api/config) 환경 변수 자동 로드
+    // Supabase 정보는 HTML/localStorage에 저장되지 않고 Vercel 환경변수에서만 주입됩니다.
     async function fetchVercelEnvironmentConfig() {
       try {
         const res = await fetch('/api/config');
         if (res.ok) {
           const data = await res.json();
-          let loaded = false;
           if (data.supabaseUrl && data.supabaseAnonKey) {
             supabaseUrl = data.supabaseUrl;
             supabaseAnonKey = data.supabaseAnonKey;
-            localStorage.setItem('menumate_supabase_url', supabaseUrl);
-            localStorage.setItem('menumate_supabase_key', supabaseAnonKey);
             initSupabaseClient();
-            loaded = true;
+            console.log('⚡ Vercel 환경 변수에서 Supabase 설정 자동 연동 성공!');
           }
           if (data.geminiApiKey) {
-            geminiApiKey = data.geminiApiKey;
-            localStorage.setItem('menumate_gemini_api_key', geminiApiKey);
-          }
-          if (loaded) {
-            console.log('⚡ Vercel 환경 변수에서 Supabase 설정 자동 연동 성공!');
+            // Vercel 환경변수 geminiApiKey는 사용자가 직접 입력한 키보다 낮은 우선순위
+            if (!geminiApiKey) {
+              geminiApiKey = data.geminiApiKey;
+            }
           }
         }
       } catch (err) {
-        // 로컬 정적 파일 실행 시(file:// 등) 조용히 기본값/로컬 스토리지 사용
+        // 로컬 정적 파일 실행 시(file:// 등) 조용히 무시
       }
     }
 
@@ -1514,13 +1519,18 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
       const badge = document.getElementById('db-status-badge');
       if (supabaseClient) {
         badge.innerHTML = '🟢 Supabase DB 연결됨';
-      } else if (supabaseUrl && supabaseAnonKey) {
-        badge.innerHTML = '🟡 Supabase 설정됨';
       } else {
-        badge.innerHTML = '⚡ Supabase DB 설정';
+        badge.innerHTML = '☁️ Supabase DB 미연결';
       }
-      document.getElementById('supabase-url').value = supabaseUrl;
-      document.getElementById('supabase-anon-key').value = supabaseAnonKey;
+      // DB 모달 연동 상태 텍스트 업데이트
+      const statusEl = document.getElementById('db-vercel-status');
+      if (statusEl) {
+        if (supabaseClient) {
+          statusEl.innerHTML = '<span style="color:#10b981;">✅ Vercel 환경변수에서 Supabase 자동 연결 완료</span>';
+        } else {
+          statusEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Supabase 미연결 — Vercel 대시보드에 환경변수를 등록해 주세요.</span>';
+        }
+      }
     }
 
     // ===== 4. 폼 및 컨트롤 초기화 =====
@@ -2387,36 +2397,16 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         showToast('API Key가 삭제되었습니다.');
       });
 
-      // Supabase DB 설정 모달 제어
+      // Supabase DB 상태 모달 제어 (입력 필드 없음 - Vercel 환경변수 전용)
       document.getElementById('btn-open-db-modal').addEventListener('click', () => {
+        updateDbUI(); // 모달 열 때 현재 연동 상태 업데이트
         document.getElementById('db-modal').classList.add('show');
       });
       document.getElementById('btn-close-db-modal').addEventListener('click', () => {
         document.getElementById('db-modal').classList.remove('show');
       });
-      document.getElementById('btn-save-db-config').addEventListener('click', async () => {
-        const url = document.getElementById('supabase-url').value.trim();
-        const key = document.getElementById('supabase-anon-key').value.trim();
-        supabaseUrl = url;
-        supabaseAnonKey = key;
-        localStorage.setItem('menumate_supabase_url', url);
-        localStorage.setItem('menumate_supabase_key', key);
-        initSupabaseClient();
-        updateDbUI();
+      document.getElementById('btn-close-db-modal-bottom').addEventListener('click', () => {
         document.getElementById('db-modal').classList.remove('show');
-        showToast('Supabase DB 설정이 저장되었습니다. 데이터를 동기화합니다.');
-        await loadUsersData();
-      });
-      document.getElementById('btn-disconnect-db').addEventListener('click', async () => {
-        supabaseUrl = '';
-        supabaseAnonKey = '';
-        localStorage.removeItem('menumate_supabase_url');
-        localStorage.removeItem('menumate_supabase_key');
-        supabaseClient = null;
-        updateDbUI();
-        document.getElementById('db-modal').classList.remove('show');
-        showToast('Supabase DB 연결이 해제되었습니다. 로컬 스토리지 모드로 작동합니다.');
-        await loadUsersData();
       });
 
       // SQL 복사 버튼
