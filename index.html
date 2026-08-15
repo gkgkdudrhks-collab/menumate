@@ -29,38 +29,52 @@
 
   <style>
     :root {
-      --ink: #28231e;
-      --ink-soft: #56483a;
-      --paper: #f8efd9;
-      --paper-dark: #dfcba4;
-      --mustard: #f3b941;
-      --rust: #bd5535;
-      --rust-dark: #873b2d;
-      --green: #557347;
-      --green-light: #87a961;
-      --navy: #283947;
-      --cream: #fff9ea;
-      --line: 3px solid var(--ink);
-      --hard-shadow: 7px 8px 0 var(--ink);
-      --font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
-      --transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+      --font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-input: #ffffff;
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-light: #fff7ed;
+      --primary-border: #fed7aa;
+      
+      --secondary: #3b82f6;
+      --secondary-light: #eff6ff;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --warning: #f59e0b;
+      --purple: #8b5cf6;
+      --purple-light: #f5f3ff;
+      
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
       font-family: var(--font-family);
-      background:
-        radial-gradient(circle at 18% 12%, rgb(171 117 65 / 11%) 0 1px, transparent 1.5px) 0 0 / 9px 9px,
-        linear-gradient(90deg, transparent 49.5%, rgb(96 65 36 / 4%) 50%, transparent 50.5%) 0 0 / 110px 100%,
-        var(--paper);
-      color: var(--ink);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       line-height: 1.55;
       padding: 24px 16px;
       display: flex;
       justify-content: center;
-      min-width: 320px;
-      overflow-x: hidden;
     }
 
     .app-container {
@@ -68,37 +82,21 @@
       max-width: 960px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     /* ===== App Header ===== */
     .app-header {
-      position: relative;
-      background:
-        linear-gradient(rgb(255 255 255 / 18%), rgb(255 255 255 / 0%)),
-        var(--mustard);
-      color: var(--ink);
-      padding: 22px 28px 30px; /* 데코를 위한 bottom 패딩 약간 추가 */
-      border: var(--line);
-      box-shadow: var(--hard-shadow);
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      color: white;
+      padding: 22px 28px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.35);
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .app-header::after {
-      position: absolute;
-      right: 0;
-      bottom: -8px;
-      left: 0;
-      height: 6px;
-      content: "";
-      opacity: 0.32;
-      background: repeating-linear-gradient(90deg, var(--ink) 0 25px, transparent 25px 40px);
-      clip-path: polygon(0 0, 100% 0, 100% 35%, 96% 85%, 89% 45%, 82% 95%, 74% 48%, 66% 90%, 58% 42%, 49% 100%, 41% 38%, 33% 88%, 25% 41%, 17% 90%, 8% 35%, 0 100%);
     }
 
     .header-logo {
@@ -110,29 +108,24 @@
     .header-logo .icon-box {
       width: 48px;
       height: 48px;
-      background: #ffd968;
-      border: var(--line);
-      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(6px);
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.6rem;
-      box-shadow: 3px 3px 0 var(--ink);
-      transform: rotate(-6deg);
     }
 
     .header-title h1 {
-      font-size: 1.6rem;
-      font-weight: 950;
-      letter-spacing: -0.05em;
-      line-height: 1.1;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
 
     .header-title p {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--ink-soft);
-      margin-top: 2px;
+      font-size: 0.86rem;
+      opacity: 0.95;
     }
 
     .header-actions {
@@ -143,51 +136,46 @@
     }
 
     .header-api-badge {
-      background: var(--cream);
-      border: 2px solid var(--ink);
-      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
       font-size: 0.8rem;
-      font-weight: 900;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      color: var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
+      color: white;
       transition: var(--transition);
     }
     .header-api-badge:hover {
-      box-shadow: 1px 1px 0 var(--ink);
-      transform: translate(2px, 2px);
-      filter: brightness(1.03);
+      background: white;
+      color: var(--primary-hover);
     }
 
     /* ===== Step Wizard Indicator ===== */
     .step-wizard {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap; /* 절대 2줄로 꺾이지 않음 */
-      background: var(--cream);
-      border: var(--line);
-      box-shadow: var(--hard-shadow);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       overflow: hidden;
-      width: 100%;
+      box-shadow: var(--shadow-sm);
     }
 
     .step-tab {
-      flex: 1;
-      min-width: 0; /* flex 컨테이너 안에서 넘치지 않고 유연하게 작아지도록 설정 */
-      white-space: nowrap; /* 텍스트 줄바꿈 금지 */
-      padding: 16px 10px;
+      padding: 14px 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      font-size: 0.88rem;
-      font-weight: 900;
-      color: var(--ink-soft);
-      background: var(--cream);
-      border-right: 3px solid var(--ink);
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
       cursor: pointer;
       transition: var(--transition);
       user-select: none;
@@ -195,55 +183,51 @@
     .step-tab:last-child { border-right: none; }
 
     .step-tab .step-num {
-      flex-shrink: 0; /* 숫자가 찌그러지지 않도록 */
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--ink);
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: var(--paper);
-      color: var(--ink);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 900;
+      font-size: 0.82rem;
+      font-weight: 800;
     }
 
     .step-tab.active {
-      background: var(--mustard);
-      color: var(--ink);
+      background: var(--primary-light);
+      color: var(--primary-hover);
     }
     .step-tab.active .step-num {
-      background: var(--rust);
-      color: var(--cream);
-      border-color: var(--ink);
+      background: var(--primary);
+      color: white;
     }
 
     @media (max-width: 640px) {
       .step-tab span.step-text { display: none; }
-      .step-tab { padding: 14px 6px; }
+      .step-tab { padding: 12px 6px; }
     }
 
     /* ===== Card Common ===== */
     .card {
-      background: var(--cream);
-      border: var(--line);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 24px;
-      box-shadow: var(--hard-shadow);
+      box-shadow: var(--shadow-md);
     }
 
     .section-title {
-      font-size: 1.22rem;
-      font-weight: 950;
-      color: var(--ink);
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       flex-wrap: wrap;
       gap: 10px;
-      border-bottom: 2px dashed var(--paper-dark);
-      padding-bottom: 10px;
     }
 
     .section-title span.left {
@@ -253,7 +237,7 @@
     }
 
     .section-title i {
-      color: var(--rust);
+      color: var(--primary);
     }
 
     /* ===== Form Elements ===== */
@@ -264,29 +248,26 @@
     .form-label {
       display: block;
       font-size: 0.85rem;
-      font-weight: 900;
-      color: var(--ink-soft);
+      font-weight: 700;
+      color: var(--text-secondary);
       margin-bottom: 6px;
-      letter-spacing: 0.03em;
     }
 
     .form-control {
       width: 100%;
       padding: 10px 14px;
-      border: 2px solid var(--ink);
-      border-radius: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 0.92rem;
       font-family: inherit;
-      font-weight: 700;
-      background: white;
-      color: var(--ink);
+      background: var(--bg-input);
+      color: var(--text-primary);
       transition: var(--transition);
-      box-shadow: 2px 2px 0 var(--ink);
     }
     .form-control:focus {
       outline: none;
-      border-color: var(--rust);
-      box-shadow: 3px 3px 0 var(--ink);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
     }
 
     /* Grid for User Creation */
@@ -300,22 +281,21 @@
     }
 
     .sub-panel {
-      background: var(--paper);
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
       padding: 16px;
       margin-bottom: 14px;
-      border: 2px dashed var(--ink-soft);
+      border: 1px solid var(--border);
     }
 
     .sub-panel-title {
       font-size: 0.85rem;
-      font-weight: 900;
-      color: var(--ink);
+      font-weight: 700;
+      color: var(--text-secondary);
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px dashed var(--ink-soft);
-      padding-bottom: 6px;
     }
 
     /* Food Chips Pool */
@@ -325,35 +305,32 @@
       gap: 6px;
       max-height: 140px;
       overflow-y: auto;
-      padding: 4px 2px;
+      padding: 2px;
     }
 
     .food-tag-chip {
-      padding: 5px 11px;
-      border-radius: 0;
+      padding: 5px 10px;
+      border-radius: var(--radius-full);
       font-size: 0.78rem;
-      font-weight: 800;
-      border: 2px solid var(--ink);
+      font-weight: 600;
+      border: 1px solid var(--border);
       background: white;
-      color: var(--ink);
       cursor: pointer;
       transition: var(--transition);
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      box-shadow: 2px 2px 0 var(--ink);
     }
-    .food-tag-chip:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0 var(--ink);
-    }
+    .food-tag-chip:hover { border-color: var(--primary); }
     .food-tag-chip.selected-like {
-      background: var(--mustard);
-      color: var(--ink);
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
     }
     .food-tag-chip.selected-dislike {
-      background: var(--rust);
-      color: var(--cream);
+      background: var(--danger);
+      color: white;
+      border-color: var(--danger);
     }
 
     /* Sliders */
@@ -361,54 +338,25 @@
       display: flex;
       flex-direction: column;
       gap: 3px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .slider-header {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      font-weight: 850;
-      color: var(--ink);
+      font-weight: 700;
     }
-    .score-val { color: var(--rust); font-weight: 900; }
-    
+    .score-val { color: var(--primary-hover); font-weight: 800; }
     .custom-range {
       width: 100%;
-      height: 10px;
-      background: var(--paper-dark);
-      border: 2px solid var(--ink);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-    }
-    .custom-range::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--ink);
-      border-radius: 50%;
-      background: var(--mustard);
-      box-shadow: 1px 1px 0 var(--ink);
-      cursor: pointer;
-    }
-    .custom-range::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--ink);
-      border-radius: 50%;
-      background: var(--mustard);
-      box-shadow: 1px 1px 0 var(--ink);
+      accent-color: var(--primary);
       cursor: pointer;
     }
     .slider-labels {
       display: flex;
       justify-content: space-between;
       font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--ink-soft);
-      margin-top: 2px;
+      color: var(--text-muted);
     }
 
     /* Allergies */
@@ -423,53 +371,45 @@
       gap: 6px;
       padding: 6px 10px;
       background: white;
-      border: 2px solid var(--ink);
-      border-radius: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       font-size: 0.78rem;
-      font-weight: 800;
+      font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
-      box-shadow: 2px 2px 0 var(--ink);
     }
-    .allergy-label:hover {
-      border-color: var(--rust);
-    }
-    .allergy-label input { 
-      accent-color: var(--rust); 
-      width: 15px;
-      height: 15px;
-    }
-    .allergy-label input:checked + span { color: var(--rust); font-weight: 900; }
+    .allergy-label:hover { border-color: var(--danger); }
+    .allergy-label input { accent-color: var(--danger); }
+    .allergy-label input:checked + span { color: var(--danger); font-weight: 700; }
 
     /* Registered Users List Cards */
     .users-grid-display {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
+      gap: 14px;
       margin-top: 14px;
     }
 
     .user-profile-card {
-      background: var(--cream);
-      border: var(--line);
-      padding: 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       gap: 10px;
-      box-shadow: var(--hard-shadow);
+      box-shadow: var(--shadow-sm);
       transition: var(--transition);
     }
     .user-profile-card:hover {
-      box-shadow: 10px 11px 0 var(--ink);
-      transform: translateY(-3px);
+      border-color: var(--primary);
+      transform: translateY(-2px);
     }
     .user-card-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px dashed var(--paper-dark);
-      padding-bottom: 8px;
     }
     .user-info-main {
       display: flex;
@@ -480,16 +420,14 @@
       font-size: 1.5rem;
       width: 40px;
       height: 40px;
-      background: var(--paper-dark);
-      border: 2px solid var(--ink);
+      background: var(--bg-subtle);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 2px 2px 0 var(--ink);
     }
-    .user-name-role h4 { font-size: 1rem; font-weight: 950; color: var(--ink); }
-    .user-name-role span { font-size: 0.75rem; color: var(--ink-soft); font-weight: 700; }
+    .user-name-role h4 { font-size: 0.95rem; font-weight: 800; }
+    .user-name-role span { font-size: 0.75rem; color: var(--text-muted); }
 
     .user-tags-row {
       display: flex;
@@ -498,78 +436,67 @@
       font-size: 0.72rem;
     }
     .tag-pill {
-      padding: 3px 8px;
-      border-radius: 0;
-      border: 1px solid var(--ink);
-      background: var(--paper);
-      color: var(--ink-soft);
-      font-weight: 800;
-      box-shadow: 1px 1px 0 var(--ink);
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
     }
-    .tag-pill.like { background: var(--mustard); color: var(--ink); }
-    .tag-pill.dislike { background: var(--rust); color: var(--cream); }
-    .tag-pill.allergy { background: #fef2f2; color: #b91c1c; font-weight: 900; }
+    .tag-pill.like { background: var(--primary-light); color: var(--primary-hover); }
+    .tag-pill.dislike { background: var(--danger-light); color: var(--danger); }
+    .tag-pill.allergy { background: #fef2f2; color: #b91c1c; font-weight: 700; }
 
     /* Buttons */
     .btn-primary {
-      background: var(--green);
-      color: var(--cream);
-      border: 2px solid var(--ink);
-      border-radius: 0;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
       padding: 14px 24px;
       font-size: 1rem;
-      font-weight: 950;
+      font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       transition: var(--transition);
-      box-shadow: 4px 4px 0 var(--ink);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
     }
     .btn-primary:hover {
-      box-shadow: 1px 1px 0 var(--ink);
-      transform: translate(3px, 3px);
-      filter: brightness(1.08);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
     }
 
     .btn-secondary {
-      background: var(--cream);
-      border: 2px solid var(--ink);
-      color: var(--ink);
-      border-radius: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-md);
       padding: 12px 20px;
       font-size: 0.92rem;
-      font-weight: 900;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       transition: var(--transition);
-      box-shadow: 3px 3px 0 var(--ink);
     }
     .btn-secondary:hover {
-      background: var(--paper);
-      box-shadow: 1px 1px 0 var(--ink);
-      transform: translate(2px, 2px);
+      background: var(--bg-subtle);
+      border-color: var(--text-secondary);
     }
 
     .btn-subtle {
       background: transparent;
-      border: 2px transparent;
-      color: var(--ink-soft);
+      border: none;
+      color: var(--text-secondary);
       padding: 4px 8px;
-      font-weight: 800;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       font-size: 0.85rem;
-      transition: var(--transition);
     }
-    .btn-subtle:hover { 
-      color: var(--rust); 
-      background: var(--cream); 
-      border: 2px solid var(--ink);
-      box-shadow: 2px 2px 0 var(--ink);
-    }
+    .btn-subtle:hover { color: var(--danger); background: var(--danger-light); }
 
     /* ===== Step 2: Member Selection Grid ===== */
     .select-members-grid {
@@ -580,28 +507,27 @@
     }
 
     .member-select-card {
-      border: 2px solid var(--ink);
-      border-radius: 0;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
       padding: 14px;
-      background: var(--cream);
+      background: var(--bg-card);
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       align-items: flex-start;
       gap: 12px;
       user-select: none;
-      box-shadow: 3px 3px 0 var(--ink);
     }
     .member-select-card.selected {
-      background: var(--mustard);
-      box-shadow: 1px 1px 0 var(--ink);
-      transform: translate(2px, 2px);
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
     }
     .member-select-checkbox {
       margin-top: 4px;
       width: 18px;
       height: 18px;
-      accent-color: var(--rust);
+      accent-color: var(--primary);
     }
 
     /* ===== Step 3: Engine Provenance Banner & LLM Results ===== */
@@ -610,63 +536,62 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 20px;
-      border: 2px solid var(--ink);
-      border-radius: 0;
+      border-radius: var(--radius-md);
       margin-bottom: 16px;
       font-size: 0.92rem;
-      font-weight: 900;
+      font-weight: 700;
+      border: 2px solid transparent;
       flex-wrap: wrap;
       gap: 8px;
-      box-shadow: 3px 3px 0 var(--ink);
     }
 
     .engine-provenance-banner.gemini {
       background: #eff6ff;
+      border-color: #3b82f6;
       color: #1e40af;
     }
 
     .engine-provenance-banner.algorithm {
       background: #f0fdf4;
+      border-color: #10b981;
       color: #166534;
     }
 
     .engine-badge-tag {
       padding: 4px 12px;
+      border-radius: var(--radius-full);
       font-size: 0.8rem;
-      font-weight: 900;
+      font-weight: 800;
       color: white;
-      border: 2px solid var(--ink);
-      box-shadow: 2px 2px 0 var(--ink);
     }
-    .engine-badge-tag.gemini { background: var(--navy); }
-    .engine-badge-tag.algorithm { background: var(--green); }
+    .engine-badge-tag.gemini { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .engine-badge-tag.algorithm { background: linear-gradient(135deg, #10b981, #059669); }
 
     /* Excluded History Bar */
     .excluded-history-bar {
-      background: var(--paper);
-      border: 2px dashed var(--ink);
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
       padding: 8px 14px;
       margin-bottom: 16px;
       font-size: 0.82rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: var(--ink-soft);
-      font-weight: 800;
+      color: var(--text-secondary);
     }
 
     .llm-analysis-summary {
-      background: var(--navy);
-      color: var(--cream);
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
       padding: 18px 22px;
-      border: var(--line);
-      box-shadow: var(--hard-shadow);
+      border-radius: var(--radius-md);
       margin-bottom: 20px;
     }
     .llm-analysis-summary h4 {
-      font-size: 1.1rem;
-      font-weight: 950;
-      color: var(--mustard);
+      font-size: 1rem;
+      font-weight: 800;
+      color: #f59e0b;
       margin-bottom: 6px;
       display: flex;
       align-items: center;
@@ -674,15 +599,14 @@
     }
     .llm-analysis-summary p {
       font-size: 0.88rem;
-      color: var(--cream);
-      opacity: 0.9;
+      color: #cbd5e1;
       line-height: 1.5;
     }
 
     .top3-cards-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: 16px;
       margin-bottom: 24px;
     }
     @media (max-width: 900px) {
@@ -690,54 +614,53 @@
     }
 
     .recom-card {
-      background: var(--cream);
-      border: var(--line);
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 22px;
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: var(--hard-shadow);
+      box-shadow: var(--shadow-sm);
     }
     .recom-card.rank-1 {
-      border-color: var(--ink);
-      outline: 4px solid var(--mustard);
-      outline-offset: 3px;
+      border-color: #f59e0b;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 35%);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
     }
+    .recom-card.rank-2 { border-color: #94a3b8; }
+    .recom-card.rank-3 { border-color: #b45309; }
 
     .rank-tag {
       position: absolute;
-      top: -14px;
+      top: -12px;
       left: 18px;
       padding: 4px 12px;
-      border: 2px solid var(--ink);
-      color: var(--cream);
+      border-radius: var(--radius-full);
+      color: white;
       font-size: 0.8rem;
-      font-weight: 900;
-      box-shadow: 2px 2px 0 var(--ink);
+      font-weight: 800;
     }
-    .rank-1 .rank-tag { background: var(--rust); }
-    .rank-2 .rank-tag { background: var(--navy); }
-    .rank-3 .rank-tag { background: var(--green); }
+    .rank-1 .rank-tag { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .rank-2 .rank-tag { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .rank-3 .rank-tag { background: linear-gradient(135deg, #b45309, #78350f); }
 
     .menu-title-row {
-      margin-top: 12px;
+      margin-top: 8px;
       margin-bottom: 10px;
-      border-bottom: 1px dashed var(--paper-dark);
-      padding-bottom: 8px;
     }
     .menu-title-row h3 {
       font-size: 1.3rem;
-      font-weight: 950;
+      font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--ink);
     }
     .menu-meta-info {
       font-size: 0.8rem;
-      color: var(--ink-soft);
-      font-weight: 800;
+      color: var(--text-secondary);
+      font-weight: 600;
       display: flex;
       gap: 8px;
       margin-top: 4px;
@@ -745,42 +668,42 @@
 
     .fit-gauge {
       margin: 12px 0;
-      background: var(--paper);
-      border: 2px solid var(--ink);
+      background: var(--bg-subtle);
       padding: 8px 12px;
+      border-radius: var(--radius-sm);
     }
     .fit-gauge-header {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      font-weight: 850;
+      font-weight: 700;
       margin-bottom: 4px;
     }
     .fit-track {
-      height: 12px;
-      background: var(--paper-dark);
-      border: 1px solid var(--ink);
+      height: 8px;
+      background: var(--border);
+      border-radius: var(--radius-full);
       overflow: hidden;
     }
     .fit-fill {
       height: 100%;
-      background: var(--green);
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: var(--radius-full);
     }
 
     .ai-reasoning-box {
       font-size: 0.82rem;
-      color: var(--ink-soft);
+      color: var(--text-secondary);
       line-height: 1.5;
       margin: 12px 0;
-      background: white;
+      background: #fafafa;
       padding: 10px;
-      border: 2px dashed var(--paper-dark);
-      border-left: 4px solid var(--rust);
-      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--primary);
     }
 
     .member-predictions-list {
-      border-top: 2px dashed var(--paper-dark);
+      border-top: 1px solid var(--border);
       padding-top: 10px;
       margin-top: 10px;
       display: flex;
@@ -791,16 +714,14 @@
     .member-pred-item {
       display: flex;
       justify-content: space-between;
-      color: var(--ink-soft);
-      font-weight: 700;
+      color: var(--text-secondary);
     }
 
     /* Voting Box */
     .voting-widget-box {
-      background: var(--navy);
-      color: var(--cream);
-      border: var(--line);
-      box-shadow: var(--hard-shadow);
+      background: #0f172a;
+      color: white;
+      border-radius: var(--radius-lg);
       padding: 22px;
     }
     .voting-widget-header {
@@ -808,8 +729,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
-      border-bottom: 2px dashed var(--ink-soft);
-      padding-bottom: 10px;
     }
     .voting-options-grid {
       display: grid;
@@ -823,40 +742,37 @@
     @media (max-width: 480px) {
       .voting-options-grid { grid-template-columns: 1fr; }
     }
-    
     .vote-btn-card {
-      background: var(--cream);
-      border: 2px solid var(--ink);
-      color: var(--ink);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
       padding: 12px;
       cursor: pointer;
       transition: var(--transition);
-      box-shadow: 3px 3px 0 var(--ink);
     }
     .vote-btn-card:hover {
-      box-shadow: 1px 1px 0 var(--ink);
-      transform: translate(2px, 2px);
-      background: var(--paper);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #f59e0b;
     }
 
     /* Loading Overlay */
     .loading-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(40, 35, 30, 0.9);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      color: var(--cream);
+      color: white;
       gap: 18px;
     }
     .loading-overlay.show { display: flex; }
     .spinner-box {
-      font-size: 3.5rem;
-      color: var(--mustard);
-      filter: drop-shadow(3px 3px 0 var(--ink));
+      font-size: 3rem;
+      color: #f59e0b;
       animation: spin 1.5s linear infinite;
     }
     @keyframes spin {
@@ -864,21 +780,19 @@
       100% { transform: rotate(360deg); }
     }
     .loading-status-text {
-      font-size: 1.3rem;
-      font-weight: 950;
-      letter-spacing: -0.02em;
+      font-size: 1.2rem;
+      font-weight: 700;
     }
     .loading-sub-text {
       font-size: 0.88rem;
-      color: var(--paper-dark);
-      font-weight: 700;
+      color: #94a3b8;
     }
 
     /* Modal */
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(40, 35, 30, 0.7);
+      background: rgba(0, 0, 0, 0.5);
       display: none;
       align-items: center;
       justify-content: center;
@@ -887,28 +801,29 @@
     }
     .modal-backdrop.show { display: flex; }
     .modal-card {
-      background: var(--cream);
-      border: var(--line);
+      background: white;
+      border-radius: var(--radius-lg);
       padding: 24px;
       width: 100%;
       max-width: 540px;
-      box-shadow: var(--hard-shadow);
+      box-shadow: var(--shadow-lg);
       max-height: 90vh;
       overflow-y: auto;
     }
 
     /* SQL code snippet box */
     .sql-snippet-box {
-      background: var(--ink);
-      color: var(--mustard);
+      background: #0f172a;
+      color: #38bdf8;
       padding: 12px;
-      border: 2px solid var(--ink);
+      border-radius: var(--radius-sm);
       font-family: monospace;
       font-size: 0.76rem;
       line-height: 1.4;
       overflow-x: auto;
       margin: 8px 0;
       max-height: 140px;
+      border: 1px solid #1e293b;
     }
 
     /* Toast */
@@ -917,13 +832,13 @@
       bottom: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: var(--ink);
-      color: var(--cream);
-      padding: 14px 22px;
-      border: var(--line);
+      background: #0f172a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
       font-size: 0.9rem;
-      font-weight: 900;
-      box-shadow: 5px 6px 0 var(--rust);
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
       opacity: 0;
       pointer-events: none;
       transition: all 0.3s ease;
@@ -935,22 +850,6 @@
     .toast-popup.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
-    }
-
-    :focus-visible {
-      outline: 4px solid var(--rust);
-      outline-offset: 4px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
     }
   </style>
 </head>
@@ -968,11 +867,6 @@
       </div>
       
       <div class="header-actions">
-        <!-- 👤 등록된 멤버 목록 (모달 버튼) -->
-        <button id="btn-open-users-modal" class="header-api-badge">
-          <i class="fa-solid fa-users"></i> <span>멤버 목록 (<span id="header-user-count">0</span>명)</span>
-        </button>
-
         <!-- Supabase Cloud DB Badge & Button -->
         <button id="btn-open-db-modal" class="header-api-badge">
           <i class="fa-solid fa-database"></i> <span id="db-status-badge">⚡ Supabase DB 설정</span>
@@ -989,32 +883,33 @@
     <nav class="step-wizard">
       <div id="step-tab-1" class="step-tab active" data-step="1">
         <span class="step-num">1</span>
-        <span class="step-text">프로필 등록</span>
+        <span class="step-text">이용자 정보 저장</span>
       </div>
       <div id="step-tab-2" class="step-tab" data-step="2">
         <span class="step-num">2</span>
-        <span class="step-text">상세 취향 설정</span>
+        <span class="step-text">멤버 선택 & 분석 요청</span>
       </div>
       <div id="step-tab-3" class="step-tab" data-step="3">
         <span class="step-num">3</span>
-        <span class="step-text">회식 추천 & 투표</span>
+        <span class="step-text">추천 결과 & 투표</span>
       </div>
     </nav>
 
     <!-- ==========================================
-         STEP 1: 이용자 프로필 등록 화면 (이름, 아바타, 태그만)
+         STEP 1: 이용자 정보 저장 화면
          ========================================== -->
     <section id="screen-step-1" class="screen-view">
-      <div class="card">
+      <!-- 1) 신규 이용자 정보 등록 폼 -->
+      <div class="card" style="margin-bottom: 20px;">
         <div class="section-title">
-          <span class="left"><i class="fa-solid fa-user-plus"></i> 이용자 기본 프로필 등록</span>
+          <span class="left"><i class="fa-solid fa-user-plus"></i> 이용자 음식 취향 프로필 등록</span>
           <span id="storage-mode-indicator" style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">
             <i class="fa-solid fa-server"></i> 저장소: 로컬 스토리지 모드
           </span>
         </div>
 
         <form id="user-register-form">
-          <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; margin-bottom: 16px;">
             <div class="form-group">
               <label class="form-label">아바타</label>
               <select id="user-avatar" class="form-control" style="font-size:1.2rem; padding: 6px 8px;">
@@ -1038,33 +933,6 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 12px; margin-top: 10px;">
-            <button type="submit" id="btn-submit-user-form" class="btn-primary" style="flex: 2;">
-              <i class="fa-solid fa-cloud-arrow-up"></i> 프로필 등록 및 다음 단계로 이동
-            </button>
-            <button type="button" id="btn-quick-goto-step-2" class="btn-secondary" style="flex: 1;">
-              취향 설정으로 이동 <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         STEP 2: 상세 취향 설정 화면 (선택된 멤버 대상)
-         ========================================== -->
-    <section id="screen-step-2" class="screen-view" style="display:none;">
-      <div class="card">
-        <div class="section-title">
-          <span class="left"><i class="fa-solid fa-sliders"></i> 멤버 상세 취향 설정</span>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 20px; max-width: 400px;">
-          <label class="form-label" for="select-taste-target-user" style="font-size: 0.9rem; color: var(--rust);">✏️ 취향을 변경/설정할 멤버 선택</label>
-          <select id="select-taste-target-user" class="form-control" style="border-color: var(--rust); font-weight: 800;"></select>
-        </div>
-
-        <form id="user-taste-form">
           <div class="user-create-layout">
             <!-- 왼쪽: 선호/불호 칩 & Food DNA 슬라이더 -->
             <div>
@@ -1144,28 +1012,37 @@
                 </div>
               </div>
 
-              <button type="button" id="btn-save-user-taste" class="btn-primary" style="width: 100%; margin-top: 10px;">
-                <i class="fa-solid fa-floppy-disk"></i> 취향 정보 저장 및 적용 (DB 동기화)
+              <button type="submit" id="btn-submit-user-form" class="btn-primary" style="width: 100%; margin-top: 10px;">
+                <i class="fa-solid fa-cloud-arrow-up"></i> 이용자 정보 저장하기 (DB 동기화)
               </button>
-              
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
-                <button type="button" id="btn-back-to-step-1" class="btn-secondary">
-                  <i class="fa-solid fa-arrow-left"></i> 프로필 등록으로
-                </button>
-                <button type="button" id="btn-goto-step-3" class="btn-primary">
-                  <span>회식 추천하러 가기</span> <i class="fa-solid fa-arrow-right"></i>
-                </button>
-              </div>
             </div>
           </div>
         </form>
       </div>
+
+      <!-- 2) 저장된 이용자 목록 카드 -->
+      <div class="card">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-users"></i> 등록된 이용자 목록 (<span id="user-count-badge">0</span>명)</span>
+          <button type="button" id="btn-load-sample-users" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 테스트용 예시 멤버 4명 불러오기
+          </button>
+        </div>
+
+        <div id="registered-users-container" class="users-grid-display"></div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" id="btn-goto-step-2" class="btn-primary" style="font-size:1.05rem;">
+            <span>다음 단계: 회식 멤버 선택하기</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- ==========================================
-         STEP 3: 이번 회식 참여 멤버 선택 & 분석 요청 화면
+         STEP 2: 이용자 선택 & 분석 시작 화면
          ========================================== -->
-    <section id="screen-step-3" class="screen-view" style="display:none;">
+    <section id="screen-step-2" class="screen-view" style="display:none;">
       <div class="card">
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-user-check"></i> 이번 회식/주문에 참여할 이용자 선택</span>
@@ -1211,89 +1088,98 @@
 
         <!-- 액션 버튼 바 -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
-          <button type="button" id="btn-back-to-step-2" class="btn-secondary">
-            <i class="fa-solid fa-arrow-left"></i> 상세 취향 설정으로
+          <button type="button" id="btn-back-to-step-1" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 이용자 관리로 돌아가기
           </button>
           <button type="button" id="btn-call-llm-recommend" class="btn-primary" style="padding:16px 28px; font-size:1.1rem;">
             <i class="fa-solid fa-wand-magic-sparkles"></i> <span>선택된 멤버 취향으로 최적 메뉴 추천 시작</span>
           </button>
         </div>
       </div>
+    </section>
 
-      <!-- 🌟 추천 결과 & 투표 카드 (초기에는 숨겨짐, 추천 완료 시 동적으로 노출) -->
-      <div id="screen-recommendation-results" style="display: none; margin-top: 24px;">
-        <div class="card">
-          <div class="section-title">
-            <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
-                <i class="fa-solid fa-arrow-up"></i> 위 조건으로 재추천받기
-              </button>
-            </div>
-          </div>
-
-          <!-- 🌟 엔진 출처 배너 (API vs 알고리즘) -->
-          <div id="engine-provenance-banner" class="engine-provenance-banner gemini">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <i id="engine-banner-icon" class="fa-solid fa-cloud-bolt" style="font-size:1.3rem;"></i>
-              <div>
-                <div id="engine-banner-title">Google Gemini LLM 연동 분석 결과입니다.</div>
-                <div id="engine-banner-sub" style="font-size:0.78rem; opacity:0.85; font-weight:500;">
-                  구글 클라우드 Gemini 거대 언어 모델이 프롬프트를 해석하여 최적의 메뉴를 도출했습니다.
-                </div>
-              </div>
-            </div>
-            <span id="engine-badge-tag" class="engine-badge-tag gemini">🟢 Gemini LLM API 사용됨</span>
-          </div>
-
-          <!-- 제외된 이전 추천 메뉴 이력 바 -->
-          <div id="excluded-history-bar" class="excluded-history-bar" style="display:none;">
-            <div>
-              <i class="fa-solid fa-clock-rotate-left"></i> <strong style="color:var(--text-primary);">이전 추천 제외 메뉴:</strong>
-              <span id="excluded-menu-tags" style="color:var(--primary); font-weight:700; margin-left:6px;"></span>
-            </div>
-            <button type="button" id="btn-reset-exclusions" class="btn-subtle" style="font-size:0.75rem; color:var(--text-muted);">
-              <i class="fa-solid fa-rotate-left"></i> 제외 목록 초기화
+    <!-- ==========================================
+         STEP 3: 추천 결과 띄워주는 화면 (스마트 재추천 지원)
+         ========================================== -->
+    <section id="screen-step-3" class="screen-view" style="display:none;">
+      <div class="card">
+        <div class="section-title">
+          <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
+              <i class="fa-solid fa-sliders"></i> 조건 변경하기
             </button>
           </div>
+        </div>
 
-          <!-- 추천 종합 진단 요약 박스 -->
-          <div id="llm-reasoning-summary" class="llm-analysis-summary">
-            <h4><i class="fa-solid fa-robot"></i> 종합 진단 분석</h4>
-            <p id="llm-summary-text">선택된 참여자들의 Food DNA와 알레르기, 최근 식사 기록을 분석하여 모두가 만족할 최적의 메뉴를 도출했습니다.</p>
-          </div>
-
-          <!-- 추천 TOP 3 카드 그리드 -->
-          <div id="step3-top3-grid" class="top3-cards-grid"></div>
-
-          <!-- 최종 메뉴 결정을 위한 투표 위젯 -->
-          <div class="voting-widget-box">
-            <div class="voting-widget-header">
-              <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
-                <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
-              </h3>
-              <span style="font-size:0.8rem; color:#94a3b8;">마음에 드는 추천 메뉴에 투표해 확정하세요. 마음에 들지 않으면 '메뉴 바꾸기'에 투표하세요.</span>
-            </div>
-
-            <div id="step3-voting-options-list" class="voting-options-grid"></div>
-
-            <!-- 📊 추천/결정 통계 현황판 -->
-            <div id="recommendation-statistics-box" style="margin-top: 18px; padding: 12px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
-              <span style="font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-chart-simple"></i> 결정 완료율 통계 현황 (GA 연동)</span>
-              <div style="display: flex; justify-content: space-around; margin-top: 8px; font-weight: 600;">
-                <div>전체 추천: <span id="stat-total" style="color:var(--text-primary);">0</span>회</div>
-                <div>추천 실패: <span id="stat-failed" style="color:var(--danger);">0</span>회</div>
-                <div>실패율: <span id="stat-fail-ratio" style="color:var(--danger);">0%</span></div>
-                <div>결정 완료율: <span id="stat-success-ratio" style="color:var(--success); font-weight: 800;">100%</span></div>
+        <!-- 🌟 엔진 출처 배너 (API vs 알고리즘) -->
+        <div id="engine-provenance-banner" class="engine-provenance-banner gemini">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i id="engine-banner-icon" class="fa-solid fa-cloud-bolt" style="font-size:1.3rem;"></i>
+            <div>
+              <div id="engine-banner-title">Google Gemini LLM 연동 분석 결과입니다.</div>
+              <div id="engine-banner-sub" style="font-size:0.78rem; opacity:0.85; font-weight:500;">
+                구글 클라우드 Gemini 거대 언어 모델이 프롬프트를 해석하여 최적의 메뉴를 도출했습니다.
               </div>
             </div>
+          </div>
+          <span id="engine-badge-tag" class="engine-badge-tag gemini">🟢 Gemini LLM API 사용됨</span>
+        </div>
 
-            <div style="text-align:center; margin-top:16px;">
-              <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px; width: 100%; max-width: 320px;">
-                🏆 투표 결과로 최종 결정하기
-              </button>
+        <!-- 제외된 이전 추천 메뉴 이력 바 -->
+        <div id="excluded-history-bar" class="excluded-history-bar" style="display:none;">
+          <div>
+            <i class="fa-solid fa-clock-rotate-left"></i> <strong style="color:var(--text-primary);">이전 추천 제외 메뉴:</strong>
+            <span id="excluded-menu-tags" style="color:var(--primary); font-weight:700; margin-left:6px;"></span>
+          </div>
+          <button type="button" id="btn-reset-exclusions" class="btn-subtle" style="font-size:0.75rem; color:var(--text-muted);">
+            <i class="fa-solid fa-rotate-left"></i> 제외 목록 초기화
+          </button>
+        </div>
+
+        <!-- 추천 종합 진단 요약 박스 -->
+        <div id="llm-reasoning-summary" class="llm-analysis-summary">
+          <h4><i class="fa-solid fa-robot"></i> 종합 진단 분석</h4>
+          <p id="llm-summary-text">선택된 참여자들의 Food DNA와 알레르기, 최근 식사 기록을 분석하여 모두가 만족할 최적의 메뉴를 도출했습니다.</p>
+        </div>
+
+        <!-- 추천 TOP 3 카드 그리드 -->
+        <div id="step3-top3-grid" class="top3-cards-grid"></div>
+
+        <!-- 최종 메뉴 결정을 위한 투표 위젯 -->
+        <div class="voting-widget-box">
+          <div class="voting-widget-header">
+            <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
+            </h3>
+            <span style="font-size:0.8rem; color:#94a3b8;">마음에 드는 추천 메뉴에 투표해 확정하세요. 마음에 들지 않으면 '메뉴 바꾸기'에 투표하세요.</span>
+          </div>
+
+          <div id="step3-voting-options-list" class="voting-options-grid"></div>
+
+          <!-- 📊 추천/결정 통계 현황판 -->
+          <div id="recommendation-statistics-box" style="margin-top: 18px; padding: 12px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+            <span style="font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-chart-simple"></i> 결정 완료율 통계 현황 (GA 연동)</span>
+            <div style="display: flex; justify-content: space-around; margin-top: 8px; font-weight: 600;">
+              <div>전체 추천: <span id="stat-total" style="color:var(--text-primary);">0</span>회</div>
+              <div>추천 실패: <span id="stat-failed" style="color:var(--danger);">0</span>회</div>
+              <div>실패율: <span id="stat-fail-ratio" style="color:var(--danger);">0%</span></div>
+              <div>결정 완료율: <span id="stat-success-ratio" style="color:var(--success); font-weight: 800;">100%</span></div>
             </div>
           </div>
+
+          <div style="text-align:center; margin-top:16px;">
+            <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px; width: 100%; max-width: 320px;">
+              🏆 투표 결과로 최종 결정하기
+            </button>
+          </div>
+        </div>
+
+        <!-- 하단 액션 버튼 바 -->
+        <div style="margin-top:20px; display:flex; justify-content:flex-start; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button type="button" id="btn-back-to-step-2" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> 참여 멤버 다시 선택하기
+          </button>
         </div>
       </div>
     </section>
@@ -1409,34 +1295,8 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
     </div>
   </div>
 
-  <!-- ==========================================
-       MODAL 3: 등록된 이용자 목록 모달 (단계 분리 대응)
-       ========================================== -->
-  <div id="users-modal" class="modal-backdrop">
-    <div class="modal-card" style="max-width: 900px; width: 100%;">
-      <div class="section-title">
-        <span class="left"><i class="fa-solid fa-users"></i> 등록된 이용자 목록 (<span id="user-count-badge">0</span>명)</span>
-        <button type="button" id="btn-close-users-modal" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--ink); font-weight:900;">&times;</button>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-        <span style="font-size:0.8rem; color:var(--ink-soft); font-weight:700;">등록된 구성원 카드를 조회하거나 삭제할 수 있습니다.</span>
-        <button type="button" id="btn-load-sample-users" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> 테스트용 예시 멤버 4명 불러오기
-        </button>
-      </div>
-
-      <div id="registered-users-container" class="users-grid-display" style="max-height: 50vh; overflow-y: auto; padding: 4px;"></div>
-
-      <div style="display:flex; justify-content:flex-end; margin-top:20px; border-top: 2px dashed var(--paper-dark); padding-top:16px;">
-        <button type="button" id="btn-close-users-modal-bottom" class="btn-primary">
-          <i class="fa-solid fa-check"></i> 닫기
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- 로딩 오버레이 -->
+  <div id="loading-overlay" class="loading-overlay">
     <div class="spinner-box"><i class="fa-solid fa-brain"></i></div>
     <div id="loading-status" class="loading-status-text">참여자들의 취향 및 조건을 분석 중입니다...</div>
     <div class="loading-sub-text">알레르기 필터링, 불호 방어 지수, 최근 식사 기록을 종합 계산하고 있습니다.</div>
@@ -1950,109 +1810,6 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
 
         container.appendChild(card);
       });
-
-      // 헤더 구성원 수 배지 실시간 동기화
-      const headerUserCountEl = document.getElementById('header-user-count');
-      if (headerUserCountEl) {
-        headerUserCountEl.textContent = users.length;
-      }
-      
-      // 상세 취향 대상 멤버 셀렉트 박스 동적 최신화
-      renderTasteTargetSelect();
-    }
-
-    // 상세 취향 변경 대상 유저 셀렉트 박스 렌더링
-    let isTasteSelectLoading = false;
-    function renderTasteTargetSelect() {
-      const selectBox = document.getElementById('select-taste-target-user');
-      if (!selectBox) return;
-
-      const currentVal = selectBox.value; // 원래 선택되어 있던 유저 ID 백업
-      selectBox.innerHTML = '';
-
-      if (users.length === 0) {
-        selectBox.innerHTML = '<option value="">(등록된 멤버가 없습니다)</option>';
-        // 폼 리셋
-        clearTasteFormInputs();
-        return;
-      }
-
-      users.forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u.id;
-        opt.textContent = `${u.avatar} ${u.name} (${u.role || '멤버'})`;
-        selectBox.appendChild(opt);
-      });
-
-      // 복구 시도
-      if (currentVal && users.some(u => u.id === currentVal)) {
-        selectBox.value = currentVal;
-      } else {
-        // 복구 실패 시 첫 유저의 취향 로드
-        selectBox.selectedIndex = 0;
-      }
-
-      // 로드 수행
-      if (selectBox.value) {
-        loadTasteTargetUser(selectBox.value);
-      }
-    }
-
-    // 선택 유저의 저장된 취향을 Step 2 설정 폼에 바인딩
-    function loadTasteTargetUser(userId) {
-      const u = users.find(x => x.id === userId);
-      if (!u) return;
-
-      isTasteSelectLoading = true;
-
-      // 1) likes / dislikes 전역 상태 및 UI 갱신
-      tempFormLikes = [...(u.likes || [])];
-      tempFormDislikes = [...(u.dislikes || [])];
-      updateFormChipsUI();
-
-      // 2) DNA 슬라이더 세팅
-      const dna = u.dna || { spice: 0, greasy: 0, meat: 0, sweet: 0 };
-      ['spice', 'greasy', 'meat', 'sweet'].forEach(key => {
-        const input = document.getElementById(`form-${key}`);
-        const text = document.getElementById(`txt-form-${key}`);
-        if (input && text) {
-          const val = dna[key] !== undefined ? dna[key] : 0;
-          input.value = val;
-          text.textContent = (val > 0 ? '+' : '') + val;
-        }
-      });
-
-      // 3) 알레르기 체크박스 체크 상태 복구
-      const activeAllergies = new Set(u.allergies || []);
-      document.querySelectorAll('#form-allergy-grid input[type="checkbox"]').forEach(cb => {
-        cb.checked = activeAllergies.has(cb.value);
-      });
-
-      // 4) 최근 식사 리스트 복구 및 렌더링
-      tempFormRecentMeals = [...(u.recentMeals || [])];
-      renderFormRecentMeals();
-
-      isTasteSelectLoading = false;
-    }
-
-    // 취향 입력 컨트롤 비우기
-    function clearTasteFormInputs() {
-      tempFormLikes = [];
-      tempFormDislikes = [];
-      tempFormRecentMeals = [];
-      updateFormChipsUI();
-      renderFormRecentMeals();
-      ['spice', 'greasy', 'meat', 'sweet'].forEach(key => {
-        const input = document.getElementById(`form-${key}`);
-        const text = document.getElementById(`txt-form-${key}`);
-        if (input && text) {
-          input.value = 0;
-          text.textContent = '0';
-        }
-      });
-      document.querySelectorAll('#form-allergy-grid input[type="checkbox"]').forEach(cb => {
-        cb.checked = false;
-      });
     }
 
     // ===== 6. 3단계 스크린 탭 전환 로직 =====
@@ -2070,17 +1827,7 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
       }
 
       if (stepNum === 2) {
-        renderTasteTargetSelect();
-      } else if (stepNum === 3) {
         renderStep2MemberSelect();
-      }
-
-      // 3단계가 아닌 곳으로 갈 때는 추천 결과 컨테이너 숨김
-      if (stepNum !== 3) {
-        const resultsArea = document.getElementById('screen-recommendation-results');
-        if (resultsArea) {
-          resultsArea.style.display = 'none';
-        }
       }
     }
 
@@ -2457,16 +2204,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       });
 
       renderStep3VotingWidget();
-      
-      // 추천 결과 영역 노출 및 자동 스크롤
-      const resultsArea = document.getElementById('screen-recommendation-results');
-      if (resultsArea) {
-        resultsArea.style.display = 'block';
-        setTimeout(() => {
-          resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
-      
+      switchStep(3);
       triggerConfetti();
 
       if (isRefresh) {
@@ -2561,56 +2299,27 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         switchStep(2);
       });
       document.getElementById('step-tab-3').addEventListener('click', () => {
-        if (users.length === 0) {
-          showToast('1단계에서 이용자를 먼저 등록해 주세요.');
+        if (currentTop3Results.length === 0) {
+          showToast('2단계에서 메뉴 추천을 먼저 실행해 주세요.');
           return;
         }
         switchStep(3);
       });
 
-      // 1단계 건너뛰기 버튼
-      document.getElementById('btn-quick-goto-step-2').addEventListener('click', () => {
+      // 1단계 -> 2단계 버튼
+      document.getElementById('btn-goto-step-2').addEventListener('click', () => {
         if (users.length === 0) {
-          showToast('등록된 멤버가 없습니다. 프로필을 먼저 등록해 주세요.');
+          showToast('이용자를 최소 1명 이상 등록해 주세요.');
           return;
         }
         switchStep(2);
       });
 
-      // 2단계 이동 / 뒤로가기 버튼 리스너
-      document.getElementById('btn-goto-step-3').addEventListener('click', () => {
-        if (users.length === 0) {
-          showToast('이용자를 최소 1명 이상 등록해 주세요.');
-          return;
-        }
-        switchStep(3);
-      });
+      // 2단계 -> 1단계
       document.getElementById('btn-back-to-step-1').addEventListener('click', () => switchStep(1));
+      // 3단계 -> 2단계
       document.getElementById('btn-back-to-step-2').addEventListener('click', () => switchStep(2));
-      document.getElementById('btn-re-recommend').addEventListener('click', () => {
-        const step3Screen = document.getElementById('screen-step-3');
-        if (step3Screen) {
-          step3Screen.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-
-      // 👥 멤버 목록 모달 제어 리스너
-      const usersModal = document.getElementById('users-modal');
-      document.getElementById('btn-open-users-modal').addEventListener('click', () => {
-        usersModal.classList.add('show');
-        renderRegisteredUsers();
-      });
-      document.getElementById('btn-close-users-modal').addEventListener('click', () => {
-        usersModal.classList.remove('show');
-      });
-      document.getElementById('btn-close-users-modal-bottom').addEventListener('click', () => {
-        usersModal.classList.remove('show');
-      });
-
-      // 상세 취향 대상 멤버 셀렉트 박스 변경 리스너
-      document.getElementById('select-taste-target-user').addEventListener('change', (e) => {
-        loadTasteTargetUser(e.target.value);
-      });
+      document.getElementById('btn-re-recommend').addEventListener('click', () => switchStep(2));
 
       // 제외 목록 초기화 버튼
       document.getElementById('btn-reset-exclusions').addEventListener('click', () => {
@@ -2619,7 +2328,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         showToast('제외 목록이 초기화되었습니다. 이제 전체 메뉴에서 다시 추천됩니다.');
       });
 
-      // 3단계 전체 선택 / 전체 해제
+      // 2단계 전체 선택 / 전체 해제
       document.getElementById('btn-select-all-members').addEventListener('click', () => {
         users.forEach(u => selectedMemberIds.add(u.id));
         renderStep2MemberSelect();
@@ -2637,7 +2346,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         renderFormRecentMeals();
       });
 
-      // 1단계: 신규 이용자 프로필 단독 등록 폼 제출
+      // 신규 이용자 저장 폼 제출
       document.getElementById('user-register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('user-name').value.trim();
@@ -2649,65 +2358,40 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
           return;
         }
 
-        const newUser = {
-          id: 'user_' + Date.now(),
-          name,
-          role: role || '멤버',
-          avatar,
-          likes: [],
-          dislikes: [],
-          dna: { spice: 0, greasy: 0, meat: 0, sweet: 0 },
-          allergies: [],
-          recentMeals: []
-        };
-
-        await saveUserRecord(newUser);
-
-        // 폼 초기화
-        document.getElementById('user-register-form').reset();
-        
-        // 2단계 상세 취향 설정 화면으로 자동 전환 및 등록된 유저 선택 지정
-        setTimeout(() => {
-          const selectBox = document.getElementById('select-taste-target-user');
-          if (selectBox) {
-            selectBox.value = newUser.id;
-            loadTasteTargetUser(newUser.id);
-          }
-          switchStep(2);
-          showToast(`'${newUser.name}'님의 프로필이 생성되었습니다. 상세 취향을 입력해 주세요! 📊`);
-        }, 100);
-      });
-
-      // 2단계: 상세 취향 변경 저장 버튼 제출
-      document.getElementById('btn-save-user-taste').addEventListener('click', async () => {
-        const userId = document.getElementById('select-taste-target-user').value;
-        if (!userId) {
-          showToast('취향을 설정할 멤버를 먼저 선택하거나 등록해 주세요.');
-          return;
-        }
-
-        const targetUser = users.find(x => x.id === userId);
-        if (!targetUser) return;
-
         const selectedAllergies = [];
         document.querySelectorAll('#form-allergy-grid input:checked').forEach(cb => {
           selectedAllergies.push(cb.value);
         });
 
-        // 수집된 폼 데이터로 취향 정보 업데이트
-        targetUser.likes = [...tempFormLikes];
-        targetUser.dislikes = [...tempFormDislikes];
-        targetUser.dna = {
-          spice: parseInt(document.getElementById('form-spice').value),
-          greasy: parseInt(document.getElementById('form-greasy').value),
-          meat: parseInt(document.getElementById('form-meat').value),
-          sweet: parseInt(document.getElementById('form-sweet').value)
+        const newUser = {
+          id: 'user_' + Date.now(),
+          name,
+          role: role || '멤버',
+          avatar,
+          likes: [...tempFormLikes],
+          dislikes: [...tempFormDislikes],
+          dna: {
+            spice: parseInt(document.getElementById('form-spice').value),
+            greasy: parseInt(document.getElementById('form-greasy').value),
+            meat: parseInt(document.getElementById('form-meat').value),
+            sweet: parseInt(document.getElementById('form-sweet').value)
+          },
+          allergies: selectedAllergies,
+          recentMeals: [...tempFormRecentMeals]
         };
-        targetUser.allergies = selectedAllergies;
-        targetUser.recentMeals = [...tempFormRecentMeals];
 
-        await saveUserRecord(targetUser);
-        showToast(`'${targetUser.name}'님의 상세 취향 정보가 DB에 동기화되었습니다. 💾`);
+        await saveUserRecord(newUser);
+
+        document.getElementById('user-register-form').reset();
+        tempFormLikes = [];
+        tempFormDislikes = [];
+        tempFormRecentMeals = [];
+        updateFormChipsUI();
+        renderFormRecentMeals();
+        ['spice', 'greasy', 'meat', 'sweet'].forEach(k => {
+          document.getElementById(`form-${k}`).value = 0;
+          document.getElementById(`txt-form-${k}`).textContent = '0';
+        });
       });
 
       // 예시 데이터 4명 로드 버튼
