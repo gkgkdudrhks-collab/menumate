@@ -1219,90 +1219,81 @@
           </button>
         </div>
       </div>
-    </section>
 
-    <!-- ==========================================
-         STEP 4: 추천 결과 띄워주는 화면 (스마트 재추천 지원)
-         ========================================== -->
-    <section id="screen-step-4" class="screen-view" style="display:none;">
-      <div class="card">
-        <div class="section-title">
-          <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
-              <i class="fa-solid fa-sliders"></i> 조건 변경하기
-            </button>
+      <!-- 🌟 추천 결과 & 투표 카드 (초기에는 숨겨짐, 추천 완료 시 동적으로 노출) -->
+      <div id="screen-recommendation-results" style="display: none; margin-top: 24px;">
+        <div class="card">
+          <div class="section-title">
+            <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
+                <i class="fa-solid fa-arrow-up"></i> 위 조건으로 재추천받기
+              </button>
+            </div>
           </div>
-        </div>
 
-        <!-- 🌟 엔진 출처 배너 (API vs 알고리즘) -->
-        <div id="engine-provenance-banner" class="engine-provenance-banner gemini">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <i id="engine-banner-icon" class="fa-solid fa-cloud-bolt" style="font-size:1.3rem;"></i>
-            <div>
-              <div id="engine-banner-title">Google Gemini LLM 연동 분석 결과입니다.</div>
-              <div id="engine-banner-sub" style="font-size:0.78rem; opacity:0.85; font-weight:500;">
-                구글 클라우드 Gemini 거대 언어 모델이 프롬프트를 해석하여 최적의 메뉴를 도출했습니다.
+          <!-- 🌟 엔진 출처 배너 (API vs 알고리즘) -->
+          <div id="engine-provenance-banner" class="engine-provenance-banner gemini">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <i id="engine-banner-icon" class="fa-solid fa-cloud-bolt" style="font-size:1.3rem;"></i>
+              <div>
+                <div id="engine-banner-title">Google Gemini LLM 연동 분석 결과입니다.</div>
+                <div id="engine-banner-sub" style="font-size:0.78rem; opacity:0.85; font-weight:500;">
+                  구글 클라우드 Gemini 거대 언어 모델이 프롬프트를 해석하여 최적의 메뉴를 도출했습니다.
+                </div>
               </div>
             </div>
-          </div>
-          <span id="engine-badge-tag" class="engine-badge-tag gemini">🟢 Gemini LLM API 사용됨</span>
-        </div>
-
-        <!-- 제외된 이전 추천 메뉴 이력 바 -->
-        <div id="excluded-history-bar" class="excluded-history-bar" style="display:none;">
-          <div>
-            <i class="fa-solid fa-clock-rotate-left"></i> <strong style="color:var(--text-primary);">이전 추천 제외 메뉴:</strong>
-            <span id="excluded-menu-tags" style="color:var(--primary); font-weight:700; margin-left:6px;"></span>
-          </div>
-          <button type="button" id="btn-reset-exclusions" class="btn-subtle" style="font-size:0.75rem; color:var(--text-muted);">
-            <i class="fa-solid fa-rotate-left"></i> 제외 목록 초기화
-          </button>
-        </div>
-
-        <!-- 추천 종합 진단 요약 박스 -->
-        <div id="llm-reasoning-summary" class="llm-analysis-summary">
-          <h4><i class="fa-solid fa-robot"></i> 종합 진단 분석</h4>
-          <p id="llm-summary-text">선택된 참여자들의 Food DNA와 알레르기, 최근 식사 기록을 분석하여 모두가 만족할 최적의 메뉴를 도출했습니다.</p>
-        </div>
-
-        <!-- 추천 TOP 3 카드 그리드 -->
-        <div id="step3-top3-grid" class="top3-cards-grid"></div>
-
-        <!-- 최종 메뉴 결정을 위한 투표 위젯 -->
-        <div class="voting-widget-box">
-          <div class="voting-widget-header">
-            <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
-            </h3>
-            <span style="font-size:0.8rem; color:#94a3b8;">마음에 드는 추천 메뉴에 투표해 확정하세요. 마음에 들지 않으면 '메뉴 바꾸기'에 투표하세요.</span>
+            <span id="engine-badge-tag" class="engine-badge-tag gemini">🟢 Gemini LLM API 사용됨</span>
           </div>
 
-          <div id="step3-voting-options-list" class="voting-options-grid"></div>
-
-          <!-- 📊 추천/결정 통계 현황판 -->
-          <div id="recommendation-statistics-box" style="margin-top: 18px; padding: 12px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
-            <span style="font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-chart-simple"></i> 결정 완료율 통계 현황 (GA 연동)</span>
-            <div style="display: flex; justify-content: space-around; margin-top: 8px; font-weight: 600;">
-              <div>전체 추천: <span id="stat-total" style="color:var(--text-primary);">0</span>회</div>
-              <div>추천 실패: <span id="stat-failed" style="color:var(--danger);">0</span>회</div>
-              <div>실패율: <span id="stat-fail-ratio" style="color:var(--danger);">0%</span></div>
-              <div>결정 완료율: <span id="stat-success-ratio" style="color:var(--success); font-weight: 800;">100%</span></div>
+          <!-- 제외된 이전 추천 메뉴 이력 바 -->
+          <div id="excluded-history-bar" class="excluded-history-bar" style="display:none;">
+            <div>
+              <i class="fa-solid fa-clock-rotate-left"></i> <strong style="color:var(--text-primary);">이전 추천 제외 메뉴:</strong>
+              <span id="excluded-menu-tags" style="color:var(--primary); font-weight:700; margin-left:6px;"></span>
             </div>
-          </div>
-
-          <div style="text-align:center; margin-top:16px;">
-            <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px; width: 100%; max-width: 320px;">
-              🏆 투표 결과로 최종 결정하기
+            <button type="button" id="btn-reset-exclusions" class="btn-subtle" style="font-size:0.75rem; color:var(--text-muted);">
+              <i class="fa-solid fa-rotate-left"></i> 제외 목록 초기화
             </button>
           </div>
-        </div>
 
-        <!-- 하단 액션 버튼 바 -->
-        <div style="margin-top:20px; display:flex; justify-content:flex-start; align-items:center; flex-wrap:wrap; gap:10px;">
-          <button type="button" id="btn-back-to-step-2" class="btn-secondary">
-            <i class="fa-solid fa-arrow-left"></i> 참여 멤버 다시 선택하기
-          </button>
+          <!-- 추천 종합 진단 요약 박스 -->
+          <div id="llm-reasoning-summary" class="llm-analysis-summary">
+            <h4><i class="fa-solid fa-robot"></i> 종합 진단 분석</h4>
+            <p id="llm-summary-text">선택된 참여자들의 Food DNA와 알레르기, 최근 식사 기록을 분석하여 모두가 만족할 최적의 메뉴를 도출했습니다.</p>
+          </div>
+
+          <!-- 추천 TOP 3 카드 그리드 -->
+          <div id="step3-top3-grid" class="top3-cards-grid"></div>
+
+          <!-- 최종 메뉴 결정을 위한 투표 위젯 -->
+          <div class="voting-widget-box">
+            <div class="voting-widget-header">
+              <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
+              </h3>
+              <span style="font-size:0.8rem; color:#94a3b8;">마음에 드는 추천 메뉴에 투표해 확정하세요. 마음에 들지 않으면 '메뉴 바꾸기'에 투표하세요.</span>
+            </div>
+
+            <div id="step3-voting-options-list" class="voting-options-grid"></div>
+
+            <!-- 📊 추천/결정 통계 현황판 -->
+            <div id="recommendation-statistics-box" style="margin-top: 18px; padding: 12px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+              <span style="font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-chart-simple"></i> 결정 완료율 통계 현황 (GA 연동)</span>
+              <div style="display: flex; justify-content: space-around; margin-top: 8px; font-weight: 600;">
+                <div>전체 추천: <span id="stat-total" style="color:var(--text-primary);">0</span>회</div>
+                <div>추천 실패: <span id="stat-failed" style="color:var(--danger);">0</span>회</div>
+                <div>실패율: <span id="stat-fail-ratio" style="color:var(--danger);">0%</span></div>
+                <div>결정 완료율: <span id="stat-success-ratio" style="color:var(--success); font-weight: 800;">100%</span></div>
+              </div>
+            </div>
+
+            <div style="text-align:center; margin-top:16px;">
+              <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px; width: 100%; max-width: 320px;">
+                🏆 투표 결과로 최종 결정하기
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -2083,6 +2074,14 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
       } else if (stepNum === 3) {
         renderStep2MemberSelect();
       }
+
+      // 3단계가 아닌 곳으로 갈 때는 추천 결과 컨테이너 숨김
+      if (stepNum !== 3) {
+        const resultsArea = document.getElementById('screen-recommendation-results');
+        if (resultsArea) {
+          resultsArea.style.display = 'none';
+        }
+      }
     }
 
     function renderStep2MemberSelect() {
@@ -2458,7 +2457,16 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       });
 
       renderStep3VotingWidget();
-      switchStep(4);
+      
+      // 추천 결과 영역 노출 및 자동 스크롤
+      const resultsArea = document.getElementById('screen-recommendation-results');
+      if (resultsArea) {
+        resultsArea.style.display = 'block';
+        setTimeout(() => {
+          resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+      
       triggerConfetti();
 
       if (isRefresh) {
@@ -2579,7 +2587,12 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       });
       document.getElementById('btn-back-to-step-1').addEventListener('click', () => switchStep(1));
       document.getElementById('btn-back-to-step-2').addEventListener('click', () => switchStep(2));
-      document.getElementById('btn-re-recommend').addEventListener('click', () => switchStep(3));
+      document.getElementById('btn-re-recommend').addEventListener('click', () => {
+        const step3Screen = document.getElementById('screen-step-3');
+        if (step3Screen) {
+          step3Screen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
 
       // 👥 멤버 목록 모달 제어 리스너
       const usersModal = document.getElementById('users-modal');
