@@ -2125,12 +2125,13 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
 
       const promptText = `
 너는 단체 회식 및 배달 음식 결정을 돕는 전문 AI 푸드 디렉터 'MenuMate'야.
-다음 모임 정보와 참여자들의 음식 취향(Food DNA, 알레르기, 최근 식사 기록)을 심층 분석하여, 구성원 전체의 불호를 최소화하고 만족도를 극대화하는 배달/회식 메뉴 TOP 3를 추천해줘.
+다음 모임 정보와 참여자들의 음식 취향(Food DNA, 알레르기, 최근 식사 기록, 선호/불호)을 심층 분석하여, 구성원 전체의 불호를 최소화하고 만족도를 극대화하는 배달/회식 메뉴 TOP 3를 추천해줘.
 
 [모임 조건]
 - 모임명: ${roomTitle}
 - 1인당 예산 한도: ${budget}원 이하
 - 최대 허용 맵기: ${maxSpice}단계 (0:순한맛 ~ 5:극강의 매운맛)${excludedListStr}
+- ⚠️ 불호(dislikes) 제외 수칙: 참여자 프로필 내의 dislikes 배열에 단 하나라도 기재된 음식 이름은 전체 그룹의 '기피 대상'으로 간주하여 절대 추천 메뉴 TOP 3에 선정하거나 포함하지 마십시오.
 
 [참여 멤버 프로필 (${selectedUsers.length}명)]
 ${JSON.stringify(selectedUsers, null, 2)}
@@ -2183,9 +2184,15 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
     }
 
     // MenuMate 내장 지능형 추천 알고리즘 엔진 (이전 추천 제외 필터링 탑재)
-    function runIntelligentFallbackEngine(selectedUsers, budget, maxSpice, isRefresh) {
+    function runIntelligentFallbackEngine(selectedUsers, budget, maxSpice, isRefresh, allowDislikeFallback = false) {
       const activeAllergies = new Set();
       selectedUsers.forEach(u => (u.allergies || []).forEach(a => activeAllergies.add(a)));
+
+      // 🌟 참여자 전체의 불호 음식 수집
+      const activeDislikes = new Set();
+      if (!allowDislikeFallback) {
+        selectedUsers.forEach(u => (u.dislikes || []).forEach(d => activeDislikes.add(d)));
+      }
 
       let candidates = [];
 
@@ -2194,6 +2201,9 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         if (menu.spice > maxSpice) return;
         if (menu.allergens.some(a => activeAllergies.has(a))) return; // 알레르기 100% 제외
         
+        // 🌟 불호 음식 100% 원천 제외 필터링
+        if (activeDislikes.has(menu.name)) return;
+
         // 🌟 재추천 시: 이전에 추천되었던 메뉴는 제외!
         if (excludedMenuNames.has(menu.name)) return;
 
@@ -2245,10 +2255,15 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         });
       });
 
-      // 만약 제외 목록 때문에 후보군이 3개 미만으로 부족해지면 제외 목록 초기화 후 재검색
+      // 만약 제외 조건들 때문에 후보군이 3개 미만으로 부족해지면 순차 완화
       if (candidates.length < 3) {
+        if (!allowDislikeFallback) {
+          // 1단계 완화: 불호 음식 완전제외 필터링만 해제하고 단순 감점(-50점) 방식으로 재시도
+          return runIntelligentFallbackEngine(selectedUsers, budget, maxSpice, isRefresh, true);
+        }
+        // 2단계 완화: 이전 추천 제외 목록을 비우고 완전 재검색
         excludedMenuNames.clear();
-        return runIntelligentFallbackEngine(selectedUsers, budget, maxSpice, false);
+        return runIntelligentFallbackEngine(selectedUsers, budget, maxSpice, false, true);
       }
 
       candidates.sort((a, b) => b.fitScore - a.fitScore);
