@@ -1103,9 +1103,6 @@
         <div class="section-title">
           <span class="left"><i class="fa-solid fa-sparkles" style="color:#f59e0b;"></i> 추천 메뉴 TOP 3</span>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" id="btn-quick-refresh-recom" class="btn-primary" style="font-size:0.85rem; padding:8px 16px; background:linear-gradient(135deg, #10b981, #059669); box-shadow:none;">
-              <i class="fa-solid fa-arrows-rotate"></i> 다른 메뉴로 재추천
-            </button>
             <button type="button" id="btn-re-recommend" class="btn-secondary" style="font-size:0.85rem; padding:8px 14px;">
               <i class="fa-solid fa-sliders"></i> 조건 변경하기
             </button>
@@ -1152,25 +1149,33 @@
             <h3 style="font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px;">
               <i class="fa-solid fa-check-to-slot" style="color:#f59e0b;"></i> 추천 메뉴 실시간 그룹 투표
             </h3>
-            <span style="font-size:0.8rem; color:#94a3b8;">가장 마음에 드는 메뉴를 투표해 최종 메뉴를 확정하세요.</span>
+            <span style="font-size:0.8rem; color:#94a3b8;">마음에 드는 추천 메뉴에 투표해 확정하세요. 마음에 들지 않으면 '메뉴 바꾸기'에 투표하세요.</span>
           </div>
 
           <div id="step3-voting-options-list" class="voting-options-grid"></div>
 
-          <div style="text-align:center; margin-top:12px;">
-            <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px;">
-              🏆 1위 메뉴로 최종 주문 결정하기!
+          <!-- 📊 추천/결정 통계 현황판 -->
+          <div id="recommendation-statistics-box" style="margin-top: 18px; padding: 12px; background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+            <span style="font-weight: 700; color: var(--text-primary);"><i class="fa-solid fa-chart-simple"></i> 결정 완료율 통계 현황 (GA 연동)</span>
+            <div style="display: flex; justify-content: space-around; margin-top: 8px; font-weight: 600;">
+              <div>전체 추천: <span id="stat-total" style="color:var(--text-primary);">0</span>회</div>
+              <div>추천 실패: <span id="stat-failed" style="color:var(--danger);">0</span>회</div>
+              <div>실패율: <span id="stat-fail-ratio" style="color:var(--danger);">0%</span></div>
+              <div>결정 완료율: <span id="stat-success-ratio" style="color:var(--success); font-weight: 800;">100%</span></div>
+            </div>
+          </div>
+
+          <div style="text-align:center; margin-top:16px;">
+            <button type="button" id="btn-finalize-order" class="btn-primary" style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:1rem; padding:12px 28px; width: 100%; max-width: 320px;">
+              🏆 투표 결과로 최종 결정하기
             </button>
           </div>
         </div>
 
         <!-- 하단 액션 버튼 바 -->
-        <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="margin-top:20px; display:flex; justify-content:flex-start; align-items:center; flex-wrap:wrap; gap:10px;">
           <button type="button" id="btn-back-to-step-2" class="btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> 참여 멤버 다시 선택하기
-          </button>
-          <button type="button" id="btn-bottom-quick-refresh" class="btn-primary" style="background:linear-gradient(135deg, #10b981, #059669); font-size:0.95rem; padding:12px 22px;">
-            <i class="fa-solid fa-arrows-rotate"></i> 다른 메뉴 조합으로 다시 추천받기
           </button>
         </div>
       </div>
@@ -1367,6 +1372,10 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
     // LLM API 키 상태 (Vercel 환경변수 /api/config 에서만 로드)
     let geminiApiKey = '';   // localStorage 미사용 - Vercel 환경변수로만 주입
     let lastUsedEngineType = 'gemini'; // 'gemini' | 'algorithm'
+
+    // 📊 애널리틱스 통계 변수 (localStorage 로 보존하여 브라우저 새로고침 시에도 유지)
+    let totalRecommendations = parseInt(localStorage.getItem('menumate_total_recom') || '0');
+    let failedRecommendations = parseInt(localStorage.getItem('menumate_failed_recom') || '0');
 
     // ===== 3. 초기화 =====
     document.addEventListener('DOMContentLoaded', async () => {
@@ -1883,6 +1892,22 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
       if (isRefresh) {
         statusText.textContent = '🔄 이전 추천 메뉴를 제외하고 새로운 후보군을 도출하는 중입니다...';
       } else {
+        // 최초 추천 시작 시 통계 및 구글 애널리틱스 카운트
+        totalRecommendations++;
+        localStorage.setItem('menumate_total_recom', totalRecommendations.toString());
+        
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'menu_recommendation_attempt', {
+              'event_category': 'recommendation',
+              'event_label': roomTitle,
+              'value': selectedUsers.length
+            });
+          }
+        } catch (e) {
+          console.warn('GA Event Error:', e);
+        }
+        
         statusText.textContent = '🧠 LLM AI가 참여자들의 취향을 종합 분석 중입니다...';
       }
 
@@ -2078,7 +2103,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
     // ===== 8. STEP 3 화면 렌더링 (엔진 출처 & 제외 이력 동기화) =====
     function displayStep3Results(summaryText, top3List, selectedUsers, engineType, isRefresh = false) {
       currentTop3Results = top3List;
-      currentVoteCounts = [0, 0, 0];
+      currentVoteCounts = [0, 0, 0, 0]; // 0~2: 메뉴, 3: 메뉴 바꾸기 투표수
 
       // 새로 추천된 3개 메뉴를 제외 목록에 등록
       top3List.forEach(item => excludedMenuNames.add(item.name));
@@ -2191,6 +2216,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
 
       const totalVotes = currentVoteCounts.reduce((a, b) => a + b, 0);
 
+      // 1. TOP 3 메뉴 투표 항목 렌더링
       currentTop3Results.forEach((item, idx) => {
         const votes = currentVoteCounts[idx];
         const pct = totalVotes === 0 ? 0 : Math.round((votes / totalVotes) * 100);
@@ -2218,6 +2244,44 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
 
         container.appendChild(card);
       });
+
+      // 2. '메뉴 바꾸기 🔄' 투표 항목 추가 렌더링 (인덱스 3)
+      const changeOptionVotes = currentVoteCounts[3];
+      const changePct = totalVotes === 0 ? 0 : Math.round((changeOptionVotes / totalVotes) * 100);
+      const changeCard = document.createElement('div');
+      changeCard.className = 'vote-btn-card';
+      changeCard.style.border = '1px dashed var(--danger)';
+      changeCard.style.background = 'rgba(239, 68, 68, 0.05)';
+      changeCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:0.95rem; color:var(--danger);"><i class="fa-solid fa-arrows-rotate"></i> 메뉴 바꾸기 (재추천 원함)</strong>
+          <span style="color:var(--danger); font-weight:800; font-size:0.85rem;">${changeOptionVotes}표 (${changePct}%)</span>
+        </div>
+        <div style="height:6px; background:rgba(239,68,68,0.15); border-radius:99px; overflow:hidden; margin-bottom:10px;">
+          <div style="height:100%; background:var(--danger); width:${changePct}%; transition:width 0.3s ease;"></div>
+        </div>
+        <button type="button" class="btn-primary" style="width:100%; padding:8px; font-size:0.85rem; background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); color:var(--danger);" data-idx="3">
+          <i class="fa-solid fa-thumbs-up"></i> 메뉴 바꾸기에 투표
+        </button>
+      `;
+
+      changeCard.querySelector('button').addEventListener('click', () => {
+        currentVoteCounts[3]++;
+        renderStep3VotingWidget();
+        showToast('메뉴 바꾸기(재추천)에 1표 투표했습니다!');
+      });
+
+      container.appendChild(changeCard);
+
+      // 3. 통계 박스 UI 데이터 갱신
+      document.getElementById('stat-total').textContent = totalRecommendations;
+      document.getElementById('stat-failed').textContent = failedRecommendations;
+      
+      const failRatio = totalRecommendations === 0 ? 0 : parseFloat(((failedRecommendations / totalRecommendations) * 100).toFixed(1));
+      const successRatio = totalRecommendations === 0 ? 100 : parseFloat(((1 - (failedRecommendations / totalRecommendations)) * 100).toFixed(1));
+      
+      document.getElementById('stat-fail-ratio').textContent = failRatio + '%';
+      document.getElementById('stat-success-ratio').textContent = successRatio + '%';
     }
 
     // ===== 9. 전체 이벤트 리스너 바인딩 =====
@@ -2253,14 +2317,6 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       // 3단계 -> 2단계
       document.getElementById('btn-back-to-step-2').addEventListener('click', () => switchStep(2));
       document.getElementById('btn-re-recommend').addEventListener('click', () => switchStep(2));
-
-      // 🌟 스마트 재추천 버튼 (상단 & 하단)
-      document.getElementById('btn-quick-refresh-recom').addEventListener('click', () => {
-        executeLLMRecommendation(true);
-      });
-      document.getElementById('btn-bottom-quick-refresh').addEventListener('click', () => {
-        executeLLMRecommendation(true);
-      });
 
       // 제외 목록 초기화 버튼
       document.getElementById('btn-reset-exclusions').addEventListener('click', () => {
@@ -2397,10 +2453,59 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
       });
 
       // 최종 주문 확정 버튼
-      document.getElementById('btn-finalize-order').addEventListener('click', () => {
+      document.getElementById('btn-finalize-order').addEventListener('click', async () => {
+        const totalVotes = currentVoteCounts.reduce((a, b) => a + b, 0);
+        if (totalVotes === 0) {
+          showToast('최종 결정을 하기 전에 최소 1표 이상 투표해 주세요.');
+          return;
+        }
+
+        // 가장 투표가 많은 인덱스를 찾음
         let maxV = -1, winIdx = 0;
-        currentVoteCounts.forEach((v, i) => { if (v > maxV) { maxV = v; winIdx = i; } });
+        currentVoteCounts.forEach((v, i) => { 
+          if (v > maxV) { 
+            maxV = v; 
+            winIdx = i; 
+          } 
+        });
+
+        // 1위가 '메뉴 바꾸기(인덱스 3)' 인 경우 -> 추천 실패로 처리 및 재추천
+        if (winIdx === 3) {
+          failedRecommendations++;
+          localStorage.setItem('menumate_failed_recom', failedRecommendations.toString());
+          
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'menu_recommendation_failure', {
+                'event_category': 'recommendation',
+                'event_label': 'Change Menu Voted 1st',
+                'value': failedRecommendations
+              });
+            }
+          } catch (e) {
+            console.warn('GA Event Error:', e);
+          }
+
+          alert('🔄 투표 결과 [메뉴 바꾸기]가 선정되어 새로운 추천 메뉴를 불러옵니다.');
+          executeLLMRecommendation(true);
+          return;
+        }
+
+        // 그 외 추천 메뉴(0, 1, 2)가 최종 결정된 경우 -> 추천 성공
         const winner = currentTop3Results[winIdx] ? currentTop3Results[winIdx].name : '추천 메뉴';
+        
+        try {
+          if (typeof gtag === 'function') {
+            gtag('event', 'menu_recommendation_success', {
+              'event_category': 'recommendation',
+              'event_label': winner,
+              'value': 1
+            });
+          }
+        } catch (e) {
+          console.warn('GA Event Error:', e);
+        }
+
         triggerConfetti();
         alert(`🎉 축하합니다!\n\n오늘의 최종 회식 메뉴는 [ ${winner} ] (으)로 결정되었습니다!\n맛있게 드세요! 😋`);
       });
