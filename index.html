@@ -3072,7 +3072,7 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
               <span style="font-size:0.75rem; color:var(--text-muted);">(${u.role || '멤버'})</span>
             </div>
             <div style="font-size:0.74rem; color:var(--text-secondary);">
-              선호: ${(u.likes || []).slice(0, 2).join(', ') || '없음'}<br>
+              선호: ${(u.likes || []).slice(0, 2).join(', ') || '없음'} / 불호: ${(u.dislikes || []).slice(0, 2).join(', ') || '없음'}<br>
               ${u.allergies && u.allergies.length > 0 ? `<strong style="color:var(--danger);">알레르기: ${u.allergies.join(', ')}</strong>` : '알레르기 없음'}
             </div>
           </div>
@@ -3182,7 +3182,8 @@ CREATE POLICY "Allow public read-write" ON public.menumate_users FOR ALL TO publ
 
       const promptText = `
 너는 단체 회식 및 배달 음식 결정을 돕는 전문 AI 푸드 디렉터 'MenuMate'야.
-다음 모임 정보와 참여자들의 음식 취향(Food DNA, 알레르기, 최근 식사 기록)을 심층 분석하여, 구성원 전체의 불호를 최소화하고 만족도를 극대화하는 배달/회식 메뉴 TOP 3를 추천해줘.
+다음 모임 정보와 참여자들의 음식 취향(Food DNA, 알레르기, 최근 식사 기록, 선호/불호)을 심층 분석하여, 구성원 전체의 불호를 최소화하고 만족도를 극대화하는 배달/회식 메뉴 TOP 3를 추천해줘.
+추천하는 각 메뉴의 구체적인 추천 사유('reason' 필드) 또는 종합 요약('summary' 필드)에 참여자들의 Food DNA(매운맛, 느끼함, 고기 비중, 단짠 점수) 취향 매칭 분석 결과가 적극 반영되었음을 반드시 언급해주어야 해.
 
 [모임 조건]
 - 모임명: ${roomTitle}
@@ -3288,7 +3289,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
         const min = Math.min(...scoresOnly);
         const fitScore = Math.max(30, Math.min(99, Math.round((avg * 0.6) + (min * 0.4))));
 
-        let reason = `참여자 ${selectedUsers.length}명 중 ${memberScores.filter(m => m.score >= 80).length}명이 만족하는 메뉴입니다.`;
+        let reason = `참여자 ${selectedUsers.length}명의 푸드 DNA 취향 매칭 및 선호 성향을 계산하여 ${memberScores.filter(m => m.score >= 80).length}명이 만족하는 메뉴입니다.`;
         if (activeAllergies.size > 0) reason += ` 알레르기 성분(${[...activeAllergies].join(', ')})이 완벽히 배제되었습니다.`;
 
         candidates.push({
@@ -3390,6 +3391,7 @@ ${isRefresh ? '3. 이전에 추천된 메뉴와 겹치지 않는 새로운 대�
               <div class="menu-meta-info">
                 <span>🏷️ ${item.category || '추천 메뉴'}</span>
                 <span>💰 1인 약 ${(item.price || 12000).toLocaleString()}원</span>
+                <span style="color:#6366f1; font-weight:700; display:inline-flex; align-items:center; gap:3px;"><i class="fa-solid fa-dna"></i> 푸드 DNA 분석 반영</span>
               </div>
             </div>
 
